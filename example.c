@@ -2,14 +2,23 @@
 
 /*
     TODO:
-    - init/destroy allegro, create display & stuff required
+    
+    init_options: struct contains everything that we need to setup - sent to init_framework
+    - window_title
+    - display_width
+    - display_height
+    - screen_width
+    - screen_height
+    - scaling_method: NO_SCALING, SCALE_TRANSFORM, SCALE_BUFFER
+    - fullscreen
+    - fps
+    - callbacks
+    - flags (KEYBOARD, MOUSE, etc..., RESIZABLE, )
+    
     - resolution independence (both methods)
     - game loop
-    - timer & fixed timestep?
     - alt-tabbing?
-    - simple input handling
-    - INPUT HANLDING: Controllers, and other functions so that
-    we can simplify the game loop
+    - INPUT HANDLING: Controllers
  */
 
 #include "allegro_framework.h"
@@ -17,18 +26,19 @@
 
 void logic()
 {
-    printf("update_logic called\n");
+    if (is_key_down(ALLEGRO_KEY_ESCAPE))
+        quit();
 }
 
 void render()
 {
-    printf("draw_graphics called\n");
+    
 }
 
 int main()
 {
     init_framework(640, 480, false, 60, logic, render);
-    game_loop();
+    run_game_loop();
     
     return 0;
 }

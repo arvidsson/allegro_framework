@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_TIMER *timer = NULL;
 ALLEGRO_FILE *logfile = NULL;
+
 bool done = false;
 bool keys[ALLEGRO_KEY_MAX] = { false };
 
@@ -36,7 +38,7 @@ void write_logfile(int log_level, const char *format, ...)
         exit(1);
 }
 
-void init_framework(int display_width, int display_height, bool fullscreen, int fps, void (*logic_callback)(), void (*render_callback)())
+void init_framework(int display_width, int display_height, bool fullscreen, void (*logic_callback)(), void (*render_callback)())
 {
     logfile = al_fopen("log.txt", "w");
     
@@ -59,7 +61,7 @@ void init_framework(int display_width, int display_height, bool fullscreen, int 
     if (!display)
         log_error("Failed to create display @ %dx%d", display_width, display_height);
     
-    timer = al_create_timer(1.0 / fps);
+    timer = al_create_timer(1.0 / 60);
     if (!timer)
         log_error("Failed to create timer @ %d fps", fps);
     
@@ -71,6 +73,7 @@ void init_framework(int display_width, int display_height, bool fullscreen, int 
     logic_proc = logic_callback;
     render_proc = render_callback;
     
+    srand(time(NULL));
     atexit(destroy_framework);
 }
 
@@ -86,7 +89,7 @@ void destroy_framework()
         al_fclose(logfile);
 }
 
-void game_loop()
+void run_game_loop()
 {
     bool redraw = true;
     al_start_timer(timer);
@@ -94,18 +97,29 @@ void game_loop()
     while (!done) {
         ALLEGRO_EVENT event;
         al_wait_for_event(event_queue, &event);
-
-        if (event.type == ALLEGRO_EVENT_TIMER) {
-            redraw = true;
-            logic_proc();
-        }
-        else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-            if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                quit();
+        
+        switch (event.type) {
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                done = true;
+                break;
+            
+            case ALLEGRO_EVENT_TIMER:
+                redraw = true;
+                logic_proc();
+                break;
+            
+            case ALLEGRO_EVENT_KEY_DOWN:
+                keys[event.keyboard.keycode] = true;
+                break;
+            
+            case ALLEGRO_EVENT_KEY_UP:
+                keys[event.keyboard.keycode] = false;
+                break;
         }
         
         if (redraw && al_is_event_queue_empty(event_queue)) {
             redraw = false;
+            al_set_target_backbuffer(display);
             al_clear_to_color(al_map_rgb(0, 0, 0));
             render_proc();
             al_flip_display();
@@ -118,6 +132,11 @@ void quit()
     done = true;
 }
 
+bool is_key_down(int keycode)
+{
+    return keys[keycode];
+}
+
 int wait_for_keypress()
 {
     ALLEGRO_EVENT event;
@@ -125,4 +144,9 @@ int wait_for_keypress()
         al_wait_for_event(event_queue, &event);
     while (event.type != ALLEGRO_EVENT_KEY_DOWN);
     return event.keyboard.keycode;
+}
+
+int get_random_int(int max, int min)
+{
+    return min + (rand() % (int)(max - min + 1));
 }
