@@ -1,7 +1,7 @@
 allegro_framework
 ========
 
-A simple framework written in C for use with the Allegro 5 library.
+A small framework written in C for use with the Allegro 5 library.
 
 See allegro_framework.h for more proper documentation of the framework. The example
 program should show in proper detail how to use the framework.
@@ -19,16 +19,20 @@ for fatal errors.
 - Initializes core allegro features: init_framework will setup allegro and create the basic things we need, such as an event queue
 and a display.
 
-- Game loop: EXPLAIN!
-
-- Alt-tabbing: the framework automatically takes care of what should happen when the user alt-tabs. You can disable this entirely
-if you want by calling disable_alt_tabbing().
+- Game loop: run_game_loop() starts the game loop. This function will call the two callbacks that you provide to the function until you
+ask the game to quit.
 
 - Resolution independence: if you design the game for a specific resolution, the framework will automatically take care of rescaling
 graphics according to how you set it up. You can either rely on a second buffer bitmap (best for bitmap heavy games), or a
 transformation (best for games relying a lot on drawing primitives).
 
+- Misc utility functions: waiting for a keypress,
+
+Planned features:
+
+- Alt-tabbing: the framework automatically takes care of what should happen when the user alt-tabs. You can disable this entirely
+if you want by calling disable_alt_tabbing().
+
 - Simplifying input: handling input is simplified, as you can register id's which are then tied to whatever kind of input (keyboard,
 mouse, joystick, etc) which makes it easier to load input configurations. See input_example.c for a better explanation :)
 
-- Misc utility functions: waiting for a keypress,
