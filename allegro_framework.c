@@ -1,4 +1,5 @@
 #include "allegro_framework.h"
+#include <allegro5/allegro_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,14 +9,15 @@ ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_TIMER *timer = NULL;
 ALLEGRO_FILE *logfile = NULL;
+ALLEGRO_FONT *default_font = NULL;
 
 bool done = false;
 bool keys[ALLEGRO_KEY_MAX] = { false };
+int mouse_x = 0, mouse_y = 0;
+bool mouse_buttons[MAX_MOUSE_BUTTONS] = { false };
 
-// callbacks
-typedef void (*function_ptr)();
-function_ptr logic_proc;
-function_ptr render_proc;
+ALLEGRO_COLOR black_color;
+ALLEGRO_COLOR white_color;
 
 void write_logfile(int log_level, const char *format, ...)
 {
@@ -38,7 +40,7 @@ void write_logfile(int log_level, const char *format, ...)
         exit(1);
 }
 
-void init_framework(int display_width, int display_height, bool fullscreen, void (*logic_callback)(), void (*render_callback)())
+void init_framework(int display_width, int display_height, bool fullscreen)
 {
     logfile = al_fopen("log.txt", "w");
     
@@ -47,6 +49,20 @@ void init_framework(int display_width, int display_height, bool fullscreen, void
     
     if (!al_install_keyboard())
         log_error("Failed to install keyboard");
+    
+    if (!al_install_mouse())
+        log_error("Failed to install mouse");
+    
+    if (!al_init_primitives_addon())
+        log_error("Failed to init primitives addon");
+    
+    if (!al_init_image_addon())
+        log_error("Failed to init image addon");
+    
+    al_init_font_addon();
+    default_font = al_create_builtin_font();
+    if (!default_font)
+        log_error("Failed to create builtin font");
     
     event_queue = al_create_event_queue();
     if (!event_queue)
@@ -63,15 +79,15 @@ void init_framework(int display_width, int display_height, bool fullscreen, void
     
     timer = al_create_timer(1.0 / 60);
     if (!timer)
-        log_error("Failed to create timer @ %d fps", fps);
+        log_error("Failed to create timer");
     
     al_register_event_source(event_queue, al_get_keyboard_event_source());
+    al_register_event_source(event_queue, al_get_mouse_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
     
-    // setup callbacks
-    logic_proc = logic_callback;
-    render_proc = render_callback;
+    black_color = al_map_rgb(0, 0, 0);
+    white_color = al_map_rgb(255, 255, 255);
     
     srand(time(NULL));
     atexit(destroy_framework);
@@ -79,6 +95,8 @@ void init_framework(int display_width, int display_height, bool fullscreen, void
 
 void destroy_framework()
 {
+    if (default_font)
+        al_destroy_font(default_font);
     if (timer)
         al_destroy_timer(timer);
     if (display)
@@ -89,10 +107,12 @@ void destroy_framework()
         al_fclose(logfile);
 }
 
-void run_game_loop()
+void run_game_loop(void (*logic_callback)(), void (*render_callback)())
 {
     bool redraw = true;
     al_start_timer(timer);
+    void (*logic_proc)() = logic_callback;
+    void (*render_proc)() = render_callback;
     
     while (!done) {
         ALLEGRO_EVENT event;
@@ -115,6 +135,19 @@ void run_game_loop()
             case ALLEGRO_EVENT_KEY_UP:
                 keys[event.keyboard.keycode] = false;
                 break;
+            
+            case ALLEGRO_EVENT_MOUSE_AXES:
+                mouse_x = event.mouse.x;
+                mouse_y = event.mouse.y;
+                break;
+            
+            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                mouse_buttons[event.mouse.button] = true;
+                break;
+            
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                mouse_buttons[event.mouse.button] = false;
+                break;
         }
         
         if (redraw && al_is_event_queue_empty(event_queue)) {
@@ -132,9 +165,34 @@ void quit()
     done = true;
 }
 
+int get_window_width()
+{
+    return al_get_display_width(display);
+}
+
+int get_window_height()
+{
+    return al_get_display_height(display);
+}
+
 bool is_key_down(int keycode)
 {
     return keys[keycode];
+}
+
+int get_mouse_x()
+{
+    return mouse_x;
+}
+
+int get_mouse_y()
+{
+    return mouse_y;
+}
+
+bool is_mouse_button_down(int mouse_button)
+{
+    return mouse_buttons[mouse_button];
 }
 
 int wait_for_keypress()
@@ -144,6 +202,18 @@ int wait_for_keypress()
         al_wait_for_event(event_queue, &event);
     while (event.type != ALLEGRO_EVENT_KEY_DOWN);
     return event.keyboard.keycode;
+}
+
+void print_textf(float x, float y, ALLEGRO_COLOR color, int flags, const char *format, ...)
+{
+    char buffer[4096];
+    
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    
+    al_draw_text(default_font, color, x, y, flags, buffer);
 }
 
 int get_random_int(int max, int min)

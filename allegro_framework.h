@@ -6,6 +6,8 @@
 #endif
 
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
 
 /*
     Logging macros. Usage:
@@ -34,7 +36,7 @@ void write_logfile(int log_level, const char *format, ...);
     Initializes the framework. This must be called before you use anything else
     in this framework!
  */
-void init_framework(int display_width, int display_height, bool fullscreen, void (*logic_callback)(), void (*render_callback)());
+void init_framework(int display_width, int display_height, bool fullscreen);
 
 /*
     Destroys everything we need to clean up when it is time to quit the program.
@@ -45,17 +47,42 @@ void destroy_framework();
 /*
     Runs the game loop; the heart of the game!
   */
-void run_game_loop();
+void run_game_loop(void (*logic_callback)(), void (*render_callback)());
 
 /*
     Will make the game loop stop running.
  */
 void quit();
 
+int get_window_width();
+int get_window_height();
+
 /*
     Returns true if a key on the keyboard is held down.
-  */
+ */
 bool is_key_down(int keycode);
+
+enum {
+    MOUSE_LEFT_BUTTON,
+    MOUSE_RIGHT_BUTTON,
+    MOUSE_MIDDLE_BUTTON,
+    MAX_MOUSE_BUTTONS
+};
+
+/*
+    Returns mouse x coordinate.
+ */
+int get_mouse_x();
+
+/*
+    Returns mouse y coordinate.
+ */
+int get_mouse_y();
+
+/*
+    Returns true if a mouse button is held down.
+ */
+bool is_mouse_button_down(int mouse_button);
 
 /*
     Waits until a key is pressed on the keyboard. It returns the keycode of the
@@ -64,9 +91,29 @@ bool is_key_down(int keycode);
 int wait_for_keypress();
 
 /*
+    Flags for aligning text in print_textf().
+  */
+enum {
+    TEXT_ALIGN_LEFT = ALLEGRO_ALIGN_LEFT,
+    TEXT_ALIGN_CENTER = ALLEGRO_ALIGN_CENTRE,
+    TEXT_ALIGN_RIGHT = ALLEGRO_ALIGN_RIGHT 
+};
+
+/*
+    Prints text using a default monospaced font and printf() formatting.
+ */
+void print_textf(float x, float y, ALLEGRO_COLOR color, int flags, const char *format, ...);
+
+/*
     Returns a random number between (max - 1) and min.
   */
 int get_random_int(int max, int min);
+
+/*
+    Some default colors.
+ */
+extern ALLEGRO_COLOR black_color;
+extern ALLEGRO_COLOR white_color;
 
 #ifdef __cplusplus
    }
