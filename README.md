@@ -3,8 +3,8 @@ allegro_framework
 
 A small framework written in C for use with the Allegro 5 library.
 
-See allegro_framework.h for more proper documentation of the framework. The example
-program should show in proper detail how to use the framework.
+See allegro_framework.h for more proper documentation of the framework.
+The example program(s) should show in more proper detail how to use the framework.
 
 Features:
 
@@ -23,10 +23,10 @@ and a display.
 ask the game to quit.
 
 - Resolution independence: if you design the game for a specific resolution, the framework will automatically take care of rescaling
-graphics according to how you set it up. You can either rely on a second buffer bitmap (best for bitmap heavy games), or a
-transformation (best for games relying a lot on drawing primitives).
+graphics according to how you set it up. You can either rely on a second buffer bitmap by calling setup_buffer_bitmap() (best for bitmap heavy games), or a
+transformation by calling setup_transformation() (best for games relying a lot on drawing primitives). Call these functions AFTER init_framework().
 
-- Misc utility functions: waiting for a keypress,
+- Misc utility functions: waiting for a keypress, random number generation
 
 Planned features:
 
@@ -35,4 +35,3 @@ if you want by calling disable_alt_tabbing().
 
 - Simplifying input: handling input is simplified, as you can register id's which are then tied to whatever kind of input (keyboard,
 mouse, joystick, etc) which makes it easier to load input configurations. See input_example.c for a better explanation :)
-
