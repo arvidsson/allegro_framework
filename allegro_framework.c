@@ -1,5 +1,4 @@
 #include "allegro_framework.h"
-#include <allegro5/allegro_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,9 +9,12 @@ ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_TIMER *timer = NULL;
 ALLEGRO_FILE *logfile = NULL;
 ALLEGRO_FONT *default_font = NULL;
+ALLEGRO_BITMAP *buffer = NULL;
+int scale_w, scale_h, scale_x, scale_y;
 
 bool done = false;
 bool keys[ALLEGRO_KEY_MAX] = { false };
+bool keys_pressed[ALLEGRO_KEY_MAX] = { false };
 int mouse_x = 0, mouse_y = 0;
 bool mouse_buttons[MAX_MOUSE_BUTTONS] = { false };
 
@@ -40,7 +42,7 @@ void write_logfile(int log_level, const char *format, ...)
         exit(1);
 }
 
-void init_framework(int display_width, int display_height, bool fullscreen)
+void init_framework(const char *window_title, int display_width, int display_height, bool fullscreen)
 {
     logfile = al_fopen("log.txt", "w");
     
@@ -76,6 +78,7 @@ void init_framework(int display_width, int display_height, bool fullscreen)
     display = al_create_display(display_width, display_height);
     if (!display)
         log_error("Failed to create display @ %dx%d", display_width, display_height);
+    al_set_window_title(display, window_title);
     
     timer = al_create_timer(1.0 / 60);
     if (!timer)
@@ -107,6 +110,42 @@ void destroy_framework()
         al_fclose(logfile);
 }
 
+void setup_buffer_bitmap(int width, int height)
+{
+    buffer = al_create_bitmap(width, height);
+    if (!buffer)
+        log_error("Failed to create buffer bitmap @ %dx%d", width, height);
+        
+    int window_width = al_get_display_width(display);
+    int window_height = al_get_display_height(display);
+    
+    // calculate scaling factor
+    int sx = window_width / width;
+    int sy = window_height / height;
+    int scale = (sx < sy) ? sx : sy;
+    
+    // calculate how much the buffer should be scaled
+    scale_w = width * scale;
+    scale_h = height * scale;
+    scale_x = (window_width - scale_w) / 2;
+    scale_y = (window_height - scale_h) / 2;
+}
+
+void setup_transformation(int width, int height)
+{
+    int window_width = al_get_display_width(display);
+    int window_height = al_get_display_height(display);
+    
+    // calculate scaling factor
+    float sx = window_width / (float)width;
+    float sy = window_height / (float)height;
+     
+    ALLEGRO_TRANSFORM trans;
+    al_identity_transform(&trans);
+    al_scale_transform(&trans, sx, sy);
+    al_use_transform(&trans);
+}
+
 void run_game_loop(void (*logic_callback)(), void (*render_callback)())
 {
     bool redraw = true;
@@ -126,10 +165,12 @@ void run_game_loop(void (*logic_callback)(), void (*render_callback)())
             case ALLEGRO_EVENT_TIMER:
                 redraw = true;
                 logic_proc();
+                memset(keys_pressed, false, sizeof(keys_pressed));
                 break;
             
             case ALLEGRO_EVENT_KEY_DOWN:
                 keys[event.keyboard.keycode] = true;
+                keys_pressed[event.keyboard.keycode] = true;
                 break;
             
             case ALLEGRO_EVENT_KEY_UP:
@@ -152,9 +193,20 @@ void run_game_loop(void (*logic_callback)(), void (*render_callback)())
         
         if (redraw && al_is_event_queue_empty(event_queue)) {
             redraw = false;
-            al_set_target_backbuffer(display);
+            if (buffer)
+                al_set_target_bitmap(buffer);
+            else
+                al_set_target_backbuffer(display);
             al_clear_to_color(al_map_rgb(0, 0, 0));
+            
             render_proc();
+            
+            if (buffer) {
+                al_set_target_backbuffer(display);
+                al_clear_to_color(al_map_rgb(0, 0, 0));
+                al_draw_scaled_bitmap(buffer, 0, 0, al_get_bitmap_width(buffer), al_get_bitmap_height(buffer), scale_x, scale_y, scale_w, scale_h, 0);
+            }
+            
             al_flip_display();
         }
     }
@@ -178,6 +230,11 @@ int get_window_height()
 bool is_key_down(int keycode)
 {
     return keys[keycode];
+}
+
+bool was_key_pressed(int keycode)
+{
+    return keys_pressed[keycode];
 }
 
 int get_mouse_x()

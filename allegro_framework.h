@@ -8,6 +8,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_image.h>
 
 /*
     Logging macros. Usage:
@@ -36,13 +37,23 @@ void write_logfile(int log_level, const char *format, ...);
     Initializes the framework. This must be called before you use anything else
     in this framework!
  */
-void init_framework(int display_width, int display_height, bool fullscreen);
+void init_framework(const char *window_title, int display_width, int display_height, bool fullscreen);
 
 /*
     Destroys everything we need to clean up when it is time to quit the program.
     This function is called automatically at program exit.
  */
 void destroy_framework();
+
+/*
+    Sets up resolution independence using a buffer bitmap.
+ */
+void setup_buffer_bitmap(int width, int height);
+
+/*
+    Sets up resolution independence using a transformation.
+ */
+void setup_transformation(int width, int height);
 
 /*
     Runs the game loop; the heart of the game!
@@ -54,13 +65,25 @@ void run_game_loop(void (*logic_callback)(), void (*render_callback)());
  */
 void quit();
 
+/*
+    Returns the width of the window.
+ */
 int get_window_width();
+
+/*
+    Returns the height of the window.
+ */
 int get_window_height();
 
 /*
     Returns true if a key on the keyboard is held down.
  */
 bool is_key_down(int keycode);
+
+/*
+    Returns true if a key on the keyboard was pressed.
+ */
+bool was_key_pressed(int keycode);
 
 enum {
     MOUSE_LEFT_BUTTON,
