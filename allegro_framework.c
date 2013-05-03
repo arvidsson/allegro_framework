@@ -15,8 +15,13 @@ int scale_w, scale_h, scale_x, scale_y;
 bool done = false;
 bool keys[ALLEGRO_KEY_MAX] = { false };
 bool keys_pressed[ALLEGRO_KEY_MAX] = { false };
+bool keys_released[ALLEGRO_KEY_MAX] = { false };
 int mouse_x = 0, mouse_y = 0;
+bool mouse_moved = false;
+int mouse_dx = 0, mouse_dy = 0;
 bool mouse_buttons[MAX_MOUSE_BUTTONS] = { false };
+bool mouse_buttons_pressed[MAX_MOUSE_BUTTONS] = { false };
+bool mouse_buttons_released[MAX_MOUSE_BUTTONS] = { false };
 
 ALLEGRO_COLOR black_color;
 ALLEGRO_COLOR white_color;
@@ -98,23 +103,33 @@ void init_framework(const char *window_title, int display_width, int display_hei
 
 void destroy_framework()
 {
-    if (default_font)
+    if (default_font) {
         al_destroy_font(default_font);
-    if (timer)
+    }
+    
+    if (timer) {
         al_destroy_timer(timer);
-    if (display)
+    }
+    
+    if (display) {
         al_destroy_display(display);
-    if (event_queue)
+    }
+    
+    if (event_queue) {
         al_destroy_event_queue(event_queue);
-    if (logfile)
+    }
+    
+    if (logfile) {
         al_fclose(logfile);
+    }
 }
 
 void setup_buffer_bitmap(int width, int height)
 {
     buffer = al_create_bitmap(width, height);
-    if (!buffer)
+    if (!buffer) {
         log_error("Failed to create buffer bitmap @ %dx%d", width, height);
+    }
         
     int window_width = al_get_display_width(display);
     int window_height = al_get_display_height(display);
@@ -146,14 +161,18 @@ void setup_transformation(int width, int height)
     al_use_transform(&trans);
 }
 
-void run_game_loop(void (*logic_callback)(), void (*render_callback)())
+void run_game_loop(void (*update_proc)(), void (*draw_proc)())
 {
     bool redraw = true;
-    al_start_timer(timer);
-    void (*logic_proc)() = logic_callback;
-    void (*render_proc)() = render_callback;
+    const double dt = 0.01;
+    double current_time = al_get_time();
+    double accumulator = 0.0;
     
     while (!done) {
+        double new_time = al_get_time();
+        double frame_time = new_time - current_time;
+        current_time = new_time;
+    
         ALLEGRO_EVENT event;
         al_wait_for_event(event_queue, &event);
         
@@ -166,6 +185,10 @@ void run_game_loop(void (*logic_callback)(), void (*render_callback)())
                 redraw = true;
                 logic_proc();
                 memset(keys_pressed, false, sizeof(keys_pressed));
+                memset(keys_released, false, sizeof(keys_pressed));
+                memset(mouse_buttons_pressed, false, sizeof(mouse_buttons_pressed));
+                memset(mouse_buttons_released, false, sizeof(mouse_buttons_released));
+                mouse_moved = false;
                 break;
             
             case ALLEGRO_EVENT_KEY_DOWN:
@@ -175,28 +198,33 @@ void run_game_loop(void (*logic_callback)(), void (*render_callback)())
             
             case ALLEGRO_EVENT_KEY_UP:
                 keys[event.keyboard.keycode] = false;
+                keys_released[event.keyboard.keycode] = true;
                 break;
             
             case ALLEGRO_EVENT_MOUSE_AXES:
                 mouse_x = event.mouse.x;
                 mouse_y = event.mouse.y;
+                mouse_moved = true;
+                mouse_dx = event.mouse.dx;
+                mouse_dy = event.mouse.dy;
                 break;
             
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 mouse_buttons[event.mouse.button] = true;
+                mouse_buttons_pressed[event.mouse.button] = true;
                 break;
             
             case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
                 mouse_buttons[event.mouse.button] = false;
+                mouse_buttons_released[event.mouse.button] = true;
                 break;
         }
         
         if (redraw && al_is_event_queue_empty(event_queue)) {
             redraw = false;
-            if (buffer)
+            if (buffer) {
                 al_set_target_bitmap(buffer);
-            else
-                al_set_target_backbuffer(display);
+            }
             al_clear_to_color(al_map_rgb(0, 0, 0));
             
             render_proc();
@@ -232,9 +260,14 @@ bool is_key_down(int keycode)
     return keys[keycode];
 }
 
-bool was_key_pressed(int keycode)
+bool is_key_pressed(int keycode)
 {
     return keys_pressed[keycode];
+}
+
+bool is_key_released(int keycode)
+{
+    return keys_released[keycode];
 }
 
 int get_mouse_x()
@@ -247,33 +280,76 @@ int get_mouse_y()
     return mouse_y;
 }
 
+bool is_moused_moved()
+{
+    return mouse_moved;
+}
+
+int get_mouse_dx()
+{
+    return mouse_dx;
+}
+
+int get_mouse_dy()
+{
+    return mouse_dy;
+}
+
 bool is_mouse_button_down(int mouse_button)
 {
     return mouse_buttons[mouse_button];
 }
 
+bool is_mouse_button_pressed(int mouse_button)
+{
+    return mouse_buttons_pressed[mouse_button];
+}
+
+bool is_mouse_button_released(int mouse_button)
+{
+    return mouse_buttons_released[mouse_button];
+}
+
 int wait_for_keypress()
 {
     ALLEGRO_EVENT event;
-    do
+    do {
         al_wait_for_event(event_queue, &event);
-    while (event.type != ALLEGRO_EVENT_KEY_DOWN);
+    } while (event.type != ALLEGRO_EVENT_KEY_DOWN);
     return event.keyboard.keycode;
 }
 
-void print_textf(float x, float y, ALLEGRO_COLOR color, int flags, const char *format, ...)
-{
-    char buffer[4096];
-    
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-    
-    al_draw_text(default_font, color, x, y, flags, buffer);
-}
-
-int get_random_int(int max, int min)
+int get_random_int(int min, int max)
 {
     return min + (rand() % (int)(max - min + 1));
+}
+
+float get_random_float(float min, float max)
+{
+    
+}
+
+ALLEGRO_FONT* get_default_font()
+{
+    return default_font;
+}
+
+bool lines_intersects(Line l1, Line l2)
+{
+    return ((l1.x1 - l1.x2) * (l2.y1 - l2.y2) - (l1.y1 - l1.y2) * (l2.x1 - l2.x2)) != 0;
+}
+
+bool rectangles_intersects(Rect r1, Rect r2)
+{
+    return !((r1.x + r1.w) < r2.x || (r1.y + r1.h) < r2.y || r1.x > (r2.x + r2.w) || r1.y > (r2.y + r2.h));
+}
+
+bool rectangle_contains_point(Rect r, Point p)
+{
+    return !(p.x < r.x || p.x > (r.x + r.w) || p.y < r.y || p.y > (r.y + r.h));
+}
+
+bool circles_intersects(Circle c1, Circle c2)
+{
+    
 }

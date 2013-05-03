@@ -2,13 +2,13 @@
 
 #include "allegro_framework.h"
 
-void logic()
+void update()
 {
     if (is_key_down(ALLEGRO_KEY_ESCAPE))
         quit();
 }
 
-void render()
+void draw()
 {
     
 }
@@ -16,7 +16,7 @@ void render()
 int main()
 {
     init_framework("basic example", 640, 480, false);
-    run_game_loop(logic, render);
+    run_game_loop(update, draw);
     
     return 0;
 }

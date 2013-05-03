@@ -20,7 +20,7 @@
 #define log_warning(...) write_logfile(LOG_WARNING, __VA_ARGS__);
 #define log_error(...)   write_logfile(LOG_ERROR, __VA_ARGS__);
 
-// logging levels (internal use)
+// logging levels (used in write_logfile)
 enum {
     LOG_MESSAGE,
     LOG_WARNING,
@@ -28,14 +28,14 @@ enum {
 };
 
 /*
-    Writes a message to the logfile. Use the macros above instead of using this
-    function directly. 
+    Writes a message to the logfile.
+    Use the macros above instead of using this function directly. 
  */
 void write_logfile(int log_level, const char *format, ...);
 
 /*
-    Initializes the framework. This must be called before you use anything else
-    in this framework!
+    Initializes the framework.
+    This must be called before you use anything else in this framework!
  */
 void init_framework(const char *window_title, int display_width, int display_height, bool fullscreen);
 
@@ -57,8 +57,8 @@ void setup_transformation(int width, int height);
 
 /*
     Runs the game loop; the heart of the game!
-  */
-void run_game_loop(void (*logic_callback)(), void (*render_callback)());
+ */
+void run_game_loop(void (*update_proc)(), void (*draw_proc)());
 
 /*
     Will make the game loop stop running.
@@ -83,7 +83,12 @@ bool is_key_down(int keycode);
 /*
     Returns true if a key on the keyboard was pressed.
  */
-bool was_key_pressed(int keycode);
+bool is_key_pressed(int keycode);
+
+/*
+    Returns true if a key on the keyboard was released.
+ */
+bool is_key_released(int keycode);
 
 enum {
     MOUSE_LEFT_BUTTON,
@@ -103,40 +108,103 @@ int get_mouse_x();
 int get_mouse_y();
 
 /*
+    Returns true if the mouse was moved.
+    Check this before you get the mouse movement deltas.
+ */
+bool is_moused_moved();
+
+/*
+    Returns mouse delta movement in x.
+ */
+int get_mouse_dx();
+
+/*
+    Returns mouse delta movement in y.
+ */
+int get_mouse_dy();
+
+/*
     Returns true if a mouse button is held down.
  */
 bool is_mouse_button_down(int mouse_button);
 
 /*
-    Waits until a key is pressed on the keyboard. It returns the keycode of the
-    key that was pressed.
+    Returns true if a mouse button was pressed.
+ */
+bool is_mouse_button_pressed(int mouse_button);
+
+/*
+    Returns true if a mouse button was released.
+ */
+bool is_mouse_button_released(int mouse_button);
+
+/*
+    Waits until a key is pressed on the keyboard.
+    It returns the keycode of the key that was pressed.
  */
 int wait_for_keypress();
 
 /*
-    Flags for aligning text in print_textf().
-  */
-enum {
-    TEXT_ALIGN_LEFT = ALLEGRO_ALIGN_LEFT,
-    TEXT_ALIGN_CENTER = ALLEGRO_ALIGN_CENTRE,
-    TEXT_ALIGN_RIGHT = ALLEGRO_ALIGN_RIGHT 
-};
-
-/*
-    Prints text using a default monospaced font and printf() formatting.
+    Returns a random integer between (max - 1) and min.
  */
-void print_textf(float x, float y, ALLEGRO_COLOR color, int flags, const char *format, ...);
+int get_random_int(int max, int min);
 
 /*
-    Returns a random number between (max - 1) and min.
-  */
-int get_random_int(int max, int min);
+    Returns a random float between (max - 1) and min.
+ */
+float get_random_float(float min, float max);
+
+/*
+    Returns a default font you can use for debugging purposes for example.
+ */
+ALLEGRO_FONT* get_default_font();
 
 /*
     Some default colors.
  */
 extern ALLEGRO_COLOR black_color;
 extern ALLEGRO_COLOR white_color;
+
+/*
+    Some primitive objects useful for collision detection.
+ */
+typedef struct {
+    float x, y;
+} Point;
+
+typedef struct {
+    float x1, y1;
+    float x2, y2;
+} Line;
+
+typedef struct {
+    float x, y;
+    float w, h;
+} Rect;
+
+typedef struct {
+    float x, y;
+    float r;
+} Circle;
+
+/*
+    Collision functions.
+ */
+bool lines_intersect(Line l1, Line l2);
+bool rectangles_intersects(Rect r1, Rect r2);
+bool rectangle_contains_point(Rect r, Point p);
+bool circles_intersects(Circle c1, Circle c2);
+
+/*
+    A basic sprite object.
+ */
+typedef struct {
+    float x, y;
+    ALLEGRO_BITMAP* bitmap;
+} Sprite;
+
+bool load_sprite(Sprite* spr, const char* filename);
+void draw_sprite(const Sprite* spr);
 
 #ifdef __cplusplus
    }
