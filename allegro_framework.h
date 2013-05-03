@@ -166,7 +166,7 @@ extern ALLEGRO_COLOR black_color;
 extern ALLEGRO_COLOR white_color;
 
 /*
-    Some primitive objects useful for collision detection.
+    2D geometry objects.
  */
 typedef struct {
     float x, y;
@@ -188,12 +188,16 @@ typedef struct {
 } Circle;
 
 /*
-    Collision functions.
+    2D geometry and intersection functions.
  */
+float distance_between_points(Point p1, Point p2);
+bool points_are_same_side_of_line(Line l, Point p1, Point p2);
 bool lines_intersect(Line l1, Line l2);
-bool rectangles_intersects(Rect r1, Rect r2);
+bool rectangles_intersect(Rect r1, Rect r2);
 bool rectangle_contains_point(Rect r, Point p);
-bool circles_intersects(Circle c1, Circle c2);
+bool circles_intersect(Circle c1, Circle c2);
+bool circle_contains_point(Circle c, Point p);
+bool circle_and_rectangle_intersect(Circle c, Rect r);
 
 #ifdef __cplusplus
    }

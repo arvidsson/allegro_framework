@@ -43,12 +43,8 @@ Waiting for a keypress, random number generation, basic 2d collision detection, 
 Planned features
 ----------------
 
-### Alt-tabbing ### 
-
-The framework automatically takes care of what should happen when the user alt-tabs. You can disable this entirely
-if you want by calling `disable_alt_tabbing()`.
-
-### Simplifying input ###
-
-Handling input is simplified, as you can register id's which are then tied to whatever kind of input (keyboard,
-mouse, joystick, etc) which makes it easier to load input configurations. See `input_example.c` for a better explanation :)
++ Alt-tabbing
++ Simplifying input handling
++ Toggle fullscreen mode
++ Handling other display related tasks
++ Alternative game loop using fixed timestep

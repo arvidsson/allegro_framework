@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_DISPLAY *display = NULL;
@@ -334,12 +335,27 @@ ALLEGRO_FONT* get_default_font()
     return default_font;
 }
 
-bool lines_intersects(Line l1, Line l2)
+float distance_between_points(Point p1, Point p2)
 {
-    return ((l1.x1 - l1.x2) * (l2.y1 - l2.y2) - (l1.y1 - l1.y2) * (l2.x1 - l2.x2)) != 0;
+    return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 }
 
-bool rectangles_intersects(Rect r1, Rect r2)
+int line_segment_intercept(float ax1,float ay1,float ax2,float ay2,float bx1,float by1,float bx2,float by2){
+    if(!same_side_of_line(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2)&&!same_side_of_line(bx1,by1,bx2,by2,ax1,ay1,ax2,ay2)) return 1;
+    return 0;                                                
+}
+
+bool points_are_same_side_of_line(Line l, Point p1, Point p2)
+{
+    return (((l.x1 - l.x2) * (p1.y - l.y2) - (l.y1 - l.y2) * (p1.x - l.x2)) * ((l.x1 - l.x2) * (p2.y - l.y2) - (l.y1 - l.y2) * (p2.x - l.x2)) >=0);
+}
+
+bool lines_intersect(Line l1, Line l2)
+{
+    return (!points_are_same_side_of_line(l1, {l2.x1, l2.y1}, {l2.x2, l2.y2}) && !points_are_same_side_of_line(l2, {l1.x1, l1.y1}, {l1.x2, l1.y2}));
+}
+
+bool rectangles_intersect(Rect r1, Rect r2)
 {
     return !((r1.x + r1.w) < r2.x || (r1.y + r1.h) < r2.y || r1.x > (r2.x + r2.w) || r1.y > (r2.y + r2.h));
 }
@@ -349,10 +365,33 @@ bool rectangle_contains_point(Rect r, Point p)
     return !(p.x < r.x || p.x > (r.x + r.w) || p.y < r.y || p.y > (r.y + r.h));
 }
 
-bool circles_intersects(Circle c1, Circle c2)
+bool circles_intersect(Circle c1, Circle c2)
 {
     float r = c1.r + c2.r;
     float dx = c1.x - c2.x;
     float dy = c1.y - c2.y;
     return (r * r) > (dx * dx + dy * dy);
+}
+
+bool circle_contains_point(Circle c, Point p)
+{
+    float dx = c.x - p.x;
+    float dy = c.y - p.y;
+    return ((dx * dx) + (dy * dy)) < (c.r * cr);
+}
+
+bool circle_and_rectangle_intersect(Circle c, Rect r)
+{
+    if ((r.x < c.x && c.x < (r.x + r.w)) && ((r.y - c.r) < c.y && cy < (r.y + r.h + c.r)))
+        return true;
+    
+    if ((r.x - c.r < c.x && c.x < (r.x + r.w + c.r)) && (r.y < c.y && cy < (r.y + r.h)))
+        return true;
+
+    if (circle_contains_point(c, {r.x, r.y})) return true;
+    if (circle_contains_point(c, {r.x + r.w, r.y})) return true;
+    if (circle_contains_point(c, {r.x, r.y + r.h})) return true;
+    if (circle_contains_point(c, {r.x + r.w, r.y + r.h})) return true;
+    
+    return false;
 }
