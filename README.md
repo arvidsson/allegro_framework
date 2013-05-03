@@ -48,3 +48,4 @@ Planned features
 + Toggle fullscreen mode
 + Handling other display related tasks
 + Alternative game loop using fixed timestep
++ More extensive examples

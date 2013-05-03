@@ -86,6 +86,13 @@ void init_framework(const char *window_title, int display_width, int display_hei
         log_error("Failed to create display @ %dx%d", display_width, display_height);
     al_set_window_title(display, window_title);
     
+    // hack: center window if not fullscreen, bug in allegro
+    if (!fullscreen) {
+        ALLEGRO_DISPLAY_MODE displayMode;
+        al_get_display_mode(al_get_num_display_modes() - 1, &displayMode);
+        al_set_window_position(display, (displayMode.width / 2) , (displayMode.height / 2) - (al_get_display_height(display) / 2));
+    }
+    
     timer = al_create_timer(1.0 / 60);
     if (!timer)
         log_error("Failed to create timer");
@@ -165,15 +172,9 @@ void setup_transformation(int width, int height)
 void run_game_loop(void (*update_proc)(), void (*draw_proc)())
 {
     bool redraw = true;
-    const double dt = 0.01;
-    double current_time = al_get_time();
-    double accumulator = 0.0;
+    al_start_timer(timer);
     
     while (!done) {
-        double new_time = al_get_time();
-        double frame_time = new_time - current_time;
-        current_time = new_time;
-    
         ALLEGRO_EVENT event;
         al_wait_for_event(event_queue, &event);
         
@@ -184,7 +185,7 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
             
             case ALLEGRO_EVENT_TIMER:
                 redraw = true;
-                logic_proc();
+                update_proc();
                 memset(keys_pressed, false, sizeof(keys_pressed));
                 memset(keys_released, false, sizeof(keys_pressed));
                 memset(mouse_buttons_pressed, false, sizeof(mouse_buttons_pressed));
@@ -228,7 +229,7 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
             }
             al_clear_to_color(al_map_rgb(0, 0, 0));
             
-            render_proc();
+            draw_proc();
             
             if (buffer) {
                 al_set_target_backbuffer(display);
@@ -340,11 +341,6 @@ float distance_between_points(Point p1, Point p2)
     return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 }
 
-int line_segment_intercept(float ax1,float ay1,float ax2,float ay2,float bx1,float by1,float bx2,float by2){
-    if(!same_side_of_line(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2)&&!same_side_of_line(bx1,by1,bx2,by2,ax1,ay1,ax2,ay2)) return 1;
-    return 0;                                                
-}
-
 bool points_are_same_side_of_line(Line l, Point p1, Point p2)
 {
     return (((l.x1 - l.x2) * (p1.y - l.y2) - (l.y1 - l.y2) * (p1.x - l.x2)) * ((l.x1 - l.x2) * (p2.y - l.y2) - (l.y1 - l.y2) * (p2.x - l.x2)) >=0);
@@ -352,7 +348,11 @@ bool points_are_same_side_of_line(Line l, Point p1, Point p2)
 
 bool lines_intersect(Line l1, Line l2)
 {
-    return (!points_are_same_side_of_line(l1, {l2.x1, l2.y1}, {l2.x2, l2.y2}) && !points_are_same_side_of_line(l2, {l1.x1, l1.y1}, {l1.x2, l1.y2}));
+    Point l1p1 = {l1.x1, l1.y1};
+    Point l1p2 = {l1.x2, l1.y2};
+    Point l2p1 = {l2.x1, l2.y1};
+    Point l2p2 = {l2.x2, l2.y2};
+    return (!points_are_same_side_of_line(l1, l2p1, l2p2) && !points_are_same_side_of_line(l2, l1p1, l1p2));
 }
 
 bool rectangles_intersect(Rect r1, Rect r2)
@@ -377,21 +377,26 @@ bool circle_contains_point(Circle c, Point p)
 {
     float dx = c.x - p.x;
     float dy = c.y - p.y;
-    return ((dx * dx) + (dy * dy)) < (c.r * cr);
+    return ((dx * dx) + (dy * dy)) < (c.r * c.r);
 }
 
 bool circle_and_rectangle_intersect(Circle c, Rect r)
 {
-    if ((r.x < c.x && c.x < (r.x + r.w)) && ((r.y - c.r) < c.y && cy < (r.y + r.h + c.r)))
+    if ((r.x < c.x && c.x < (r.x + r.w)) && ((r.y - c.r) < c.y && c.y < (r.y + r.h + c.r)))
         return true;
     
-    if ((r.x - c.r < c.x && c.x < (r.x + r.w + c.r)) && (r.y < c.y && cy < (r.y + r.h)))
+    if ((r.x - c.r < c.x && c.x < (r.x + r.w + c.r)) && (r.y < c.y && c.y < (r.y + r.h)))
         return true;
-
-    if (circle_contains_point(c, {r.x, r.y})) return true;
-    if (circle_contains_point(c, {r.x + r.w, r.y})) return true;
-    if (circle_contains_point(c, {r.x, r.y + r.h})) return true;
-    if (circle_contains_point(c, {r.x + r.w, r.y + r.h})) return true;
+    
+    Point p1 = {r.x, r.y};
+    Point p2 = {r.x + r.w, r.y};
+    Point p3 = {r.x, r.y + r.h};
+    Point p4 = {r.x + r.w, r.y + r.h};
+    
+    if (circle_contains_point(c, p1)) return true;
+    if (circle_contains_point(c, p2)) return true;
+    if (circle_contains_point(c, p3)) return true;
+    if (circle_contains_point(c, p4)) return true;
     
     return false;
 }

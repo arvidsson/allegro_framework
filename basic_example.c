@@ -2,15 +2,29 @@
 
 #include "allegro_framework.h"
 
+Rect r = { 100, 100, 100, 100};
+float dx = 5, dy = 5;
+
 void update()
 {
-    if (is_key_down(ALLEGRO_KEY_ESCAPE))
+    if (is_key_down(ALLEGRO_KEY_ESCAPE)) {
         quit();
+    }
+    
+    r.x += dx;
+    r.y += dy;
+    
+    if (r.x < 0 || r.x + r.w > get_window_width()) {
+        dx = -dx;
+    }
+    if (r.y < 0 || r.y + r.h > get_window_height()) {
+        dy = -dy;
+    }
 }
 
 void draw()
 {
-    
+    al_draw_filled_rectangle(r.x, r.y, r.x + r.w, r.y + r.h, al_map_rgb(255, 0, 0));
 }
 
 int main()
