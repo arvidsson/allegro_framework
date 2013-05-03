@@ -326,7 +326,7 @@ int get_random_int(int min, int max)
 
 float get_random_float(float min, float max)
 {
-    
+    return min + ((float)rand() / ((float)RAND_MAX / (max - min)));
 }
 
 ALLEGRO_FONT* get_default_font()
@@ -351,5 +351,8 @@ bool rectangle_contains_point(Rect r, Point p)
 
 bool circles_intersects(Circle c1, Circle c2)
 {
-    
+    float r = c1.r + c2.r;
+    float dx = c1.x - c2.x;
+    float dy = c1.y - c2.y;
+    return (r * r) > (dx * dx + dy * dy);
 }

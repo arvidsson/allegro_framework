@@ -145,12 +145,12 @@ bool is_mouse_button_released(int mouse_button);
 int wait_for_keypress();
 
 /*
-    Returns a random integer between (max - 1) and min.
+    Returns a random integer between [min, max].
  */
 int get_random_int(int max, int min);
 
 /*
-    Returns a random float between (max - 1) and min.
+    Returns a random float between [min, max].
  */
 float get_random_float(float min, float max);
 
@@ -194,17 +194,6 @@ bool lines_intersect(Line l1, Line l2);
 bool rectangles_intersects(Rect r1, Rect r2);
 bool rectangle_contains_point(Rect r, Point p);
 bool circles_intersects(Circle c1, Circle c2);
-
-/*
-    A basic sprite object.
- */
-typedef struct {
-    float x, y;
-    ALLEGRO_BITMAP* bitmap;
-} Sprite;
-
-bool load_sprite(Sprite* spr, const char* filename);
-void draw_sprite(const Sprite* spr);
 
 #ifdef __cplusplus
    }
