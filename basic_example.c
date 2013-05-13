@@ -2,8 +2,13 @@
 
 #include "allegro_framework.h"
 
-Rect r = { 100, 100, 100, 100};
-float dx = 5, dy = 5;
+typedef struct {
+    float x, y;
+    float w, h;
+    float dx, dy;
+} Rect;
+
+Rect r = { 100, 100, 100, 100, 3, 3 };
 
 void update()
 {
@@ -11,14 +16,14 @@ void update()
         quit();
     }
     
-    r.x += dx;
-    r.y += dy;
+    r.x += r.dx;
+    r.y += r.dy;
     
     if (r.x < 0 || r.x + r.w > get_window_width()) {
-        dx = -dx;
+        r.dx = -r.dx;
     }
     if (r.y < 0 || r.y + r.h > get_window_height()) {
-        dy = -dy;
+        r.dy = -r.dy;
     }
 }
 

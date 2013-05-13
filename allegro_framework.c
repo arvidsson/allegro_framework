@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <math.h>
 
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_DISPLAY *display = NULL;
@@ -18,7 +16,6 @@ bool keys[ALLEGRO_KEY_MAX] = { false };
 bool keys_pressed[ALLEGRO_KEY_MAX] = { false };
 bool keys_released[ALLEGRO_KEY_MAX] = { false };
 int mouse_x = 0, mouse_y = 0;
-bool mouse_moved = false;
 int mouse_dx = 0, mouse_dy = 0;
 bool mouse_buttons[MAX_MOUSE_BUTTONS] = { false };
 bool mouse_buttons_pressed[MAX_MOUSE_BUTTONS] = { false };
@@ -52,50 +49,66 @@ void init_framework(const char *window_title, int display_width, int display_hei
 {
     logfile = al_fopen("log.txt", "w");
     
-    if (!al_init())
+    if (!al_init()) {
         log_error("Failed to initialize allegro");
+    }
     
-    if (!al_install_keyboard())
+    if (!al_install_keyboard()) {
         log_error("Failed to install keyboard");
+    }
     
-    if (!al_install_mouse())
+    if (!al_install_mouse()) {
         log_error("Failed to install mouse");
+    }
     
-    if (!al_init_primitives_addon())
+    if (!al_init_primitives_addon()) {
         log_error("Failed to init primitives addon");
+    }
     
-    if (!al_init_image_addon())
+    if (!al_init_image_addon()) {
         log_error("Failed to init image addon");
+    }
     
     al_init_font_addon();
     default_font = al_create_builtin_font();
-    if (!default_font)
+    if (!default_font) {
         log_error("Failed to create builtin font");
-    
-    event_queue = al_create_event_queue();
-    if (!event_queue)
-        log_error("Failed to create event queue");
-    
-    if (fullscreen)
-        al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-    else
-        al_set_new_display_flags(ALLEGRO_WINDOWED);
-    
-    display = al_create_display(display_width, display_height);
-    if (!display)
-        log_error("Failed to create display @ %dx%d", display_width, display_height);
-    al_set_window_title(display, window_title);
-    
-    // hack: center window if not fullscreen, bug in allegro
-    if (!fullscreen) {
-        ALLEGRO_DISPLAY_MODE displayMode;
-        al_get_display_mode(al_get_num_display_modes() - 1, &displayMode);
-        al_set_window_position(display, (displayMode.width / 2) , (displayMode.height / 2) - (al_get_display_height(display) / 2));
     }
     
+    event_queue = al_create_event_queue();
+    if (!event_queue) {
+        log_error("Failed to create event queue");
+    }
+    
+    if (fullscreen) {
+        al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_OPENGL);
+    }
+    else {
+        al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
+    }
+    
+    al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
+    
+    // hack: center window if not fullscreen, bug in allegro
+    ALLEGRO_MONITOR_INFO info;
+    if (!al_get_monitor_info(0, &info)) {
+        log_error("Failed to get monitor info");
+    }
+    int midx = (info.x2 - info.x1) / 2;
+    int midy = (info.y2 - info.y1) / 2;
+    al_set_new_window_position (midx - (display_width / 2), midy - (display_height / 2));
+    
+    display = al_create_display(display_width, display_height);
+    if (!display) {
+        log_error("Failed to create display @ %dx%d", display_width, display_height);
+    }
+    al_set_window_title(display, window_title);
+    
     timer = al_create_timer(1.0 / 60);
-    if (!timer)
+    if (!timer) {
         log_error("Failed to create timer");
+    }
     
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_mouse_event_source());
@@ -105,7 +118,6 @@ void init_framework(const char *window_title, int display_width, int display_hei
     black_color = al_map_rgb(0, 0, 0);
     white_color = al_map_rgb(255, 255, 255);
     
-    srand(time(NULL));
     atexit(destroy_framework);
 }
 
@@ -132,41 +144,41 @@ void destroy_framework()
     }
 }
 
-void setup_buffer_bitmap(int width, int height)
+void setup_viewport(int width, int height, bool use_buffer_bitmap);
 {
-    buffer = al_create_bitmap(width, height);
-    if (!buffer) {
-        log_error("Failed to create buffer bitmap @ %dx%d", width, height);
-    }
+    if (use_buffer_bitmap) {
+        buffer = al_create_bitmap(width, height);
+        if (!buffer) {
+            log_error("Failed to create buffer bitmap @ %dx%d", width, height);
+        }
+            
+        int window_width = al_get_display_width(display);
+        int window_height = al_get_display_height(display);
         
-    int window_width = al_get_display_width(display);
-    int window_height = al_get_display_height(display);
-    
-    // calculate scaling factor
-    int sx = window_width / width;
-    int sy = window_height / height;
-    int scale = (sx < sy) ? sx : sy;
-    
-    // calculate how much the buffer should be scaled
-    scale_w = width * scale;
-    scale_h = height * scale;
-    scale_x = (window_width - scale_w) / 2;
-    scale_y = (window_height - scale_h) / 2;
-}
-
-void setup_transformation(int width, int height)
-{
-    int window_width = al_get_display_width(display);
-    int window_height = al_get_display_height(display);
-    
-    // calculate scaling factor
-    float sx = window_width / (float)width;
-    float sy = window_height / (float)height;
-     
-    ALLEGRO_TRANSFORM trans;
-    al_identity_transform(&trans);
-    al_scale_transform(&trans, sx, sy);
-    al_use_transform(&trans);
+        // calculate scaling factor
+        int sx = window_width / width;
+        int sy = window_height / height;
+        int scale = (sx < sy) ? sx : sy;
+        
+        // calculate how much the buffer should be scaled
+        scale_w = width * scale;
+        scale_h = height * scale;
+        scale_x = (window_width - scale_w) / 2;
+        scale_y = (window_height - scale_h) / 2;
+    }
+    else {
+        int window_width = al_get_display_width(display);
+        int window_height = al_get_display_height(display);
+        
+        // calculate scaling factor
+        float sx = window_width / (float)width;
+        float sy = window_height / (float)height;
+         
+        ALLEGRO_TRANSFORM trans;
+        al_identity_transform(&trans);
+        al_scale_transform(&trans, sx, sy);
+        al_use_transform(&trans);
+    }
 }
 
 void run_game_loop(void (*update_proc)(), void (*draw_proc)())
@@ -190,7 +202,7 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
                 memset(keys_released, false, sizeof(keys_pressed));
                 memset(mouse_buttons_pressed, false, sizeof(mouse_buttons_pressed));
                 memset(mouse_buttons_released, false, sizeof(mouse_buttons_released));
-                mouse_moved = false;
+                mouse_dx = mouse_dy = 0;
                 break;
             
             case ALLEGRO_EVENT_KEY_DOWN:
@@ -206,7 +218,6 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
             case ALLEGRO_EVENT_MOUSE_AXES:
                 mouse_x = event.mouse.x;
                 mouse_y = event.mouse.y;
-                mouse_moved = true;
                 mouse_dx = event.mouse.dx;
                 mouse_dy = event.mouse.dy;
                 break;
@@ -282,11 +293,6 @@ int get_mouse_y()
     return mouse_y;
 }
 
-bool is_moused_moved()
-{
-    return mouse_moved;
-}
-
 int get_mouse_dx()
 {
     return mouse_dx;
@@ -321,82 +327,7 @@ int wait_for_keypress()
     return event.keyboard.keycode;
 }
 
-int get_random_int(int min, int max)
-{
-    return min + (rand() % (int)(max - min + 1));
-}
-
-float get_random_float(float min, float max)
-{
-    return min + ((float)rand() / ((float)RAND_MAX / (max - min)));
-}
-
 ALLEGRO_FONT* get_default_font()
 {
     return default_font;
-}
-
-float distance_between_points(Point p1, Point p2)
-{
-    return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
-}
-
-bool points_are_same_side_of_line(Line l, Point p1, Point p2)
-{
-    return (((l.x1 - l.x2) * (p1.y - l.y2) - (l.y1 - l.y2) * (p1.x - l.x2)) * ((l.x1 - l.x2) * (p2.y - l.y2) - (l.y1 - l.y2) * (p2.x - l.x2)) >=0);
-}
-
-bool lines_intersect(Line l1, Line l2)
-{
-    Point l1p1 = {l1.x1, l1.y1};
-    Point l1p2 = {l1.x2, l1.y2};
-    Point l2p1 = {l2.x1, l2.y1};
-    Point l2p2 = {l2.x2, l2.y2};
-    return (!points_are_same_side_of_line(l1, l2p1, l2p2) && !points_are_same_side_of_line(l2, l1p1, l1p2));
-}
-
-bool rectangles_intersect(Rect r1, Rect r2)
-{
-    return !((r1.x + r1.w) < r2.x || (r1.y + r1.h) < r2.y || r1.x > (r2.x + r2.w) || r1.y > (r2.y + r2.h));
-}
-
-bool rectangle_contains_point(Rect r, Point p)
-{
-    return !(p.x < r.x || p.x > (r.x + r.w) || p.y < r.y || p.y > (r.y + r.h));
-}
-
-bool circles_intersect(Circle c1, Circle c2)
-{
-    float r = c1.r + c2.r;
-    float dx = c1.x - c2.x;
-    float dy = c1.y - c2.y;
-    return (r * r) > (dx * dx + dy * dy);
-}
-
-bool circle_contains_point(Circle c, Point p)
-{
-    float dx = c.x - p.x;
-    float dy = c.y - p.y;
-    return ((dx * dx) + (dy * dy)) < (c.r * c.r);
-}
-
-bool circle_and_rectangle_intersect(Circle c, Rect r)
-{
-    if ((r.x < c.x && c.x < (r.x + r.w)) && ((r.y - c.r) < c.y && c.y < (r.y + r.h + c.r)))
-        return true;
-    
-    if ((r.x - c.r < c.x && c.x < (r.x + r.w + c.r)) && (r.y < c.y && c.y < (r.y + r.h)))
-        return true;
-    
-    Point p1 = {r.x, r.y};
-    Point p2 = {r.x + r.w, r.y};
-    Point p3 = {r.x, r.y + r.h};
-    Point p4 = {r.x + r.w, r.y + r.h};
-    
-    if (circle_contains_point(c, p1)) return true;
-    if (circle_contains_point(c, p2)) return true;
-    if (circle_contains_point(c, p3)) return true;
-    if (circle_contains_point(c, p4)) return true;
-    
-    return false;
 }
