@@ -33,8 +33,8 @@ ask the game to quit.
 ### Resolution independence ###
 
 If you design the game for a specific resolution, the framework will automatically take care of rescaling
-graphics according to how you set it up. You can either rely on a second buffer bitmap by calling `setup_buffer_bitmap()` (best for bitmap heavy games), or a
-transformation by calling `setup_transformation()` (best for games relying a lot on drawing primitives). Call these functions **after** `init_framework()`.
+graphics according to how you set it up. You can either rely on a second buffer bitmap by calling `setup_viewport()` where `use_buffer_bitmap = true` (best for bitmap heavy games), or a
+transformation by calling `setup_viewport()` where `use_buffer_bitmap = false` (best for games relying a lot on drawing primitives). Call that function **after** `init_framework()`.
 
 ### Misc utility functions ###
 
