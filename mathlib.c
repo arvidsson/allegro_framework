@@ -1,21 +1,5 @@
 #include "mathlib.h"
-#include <time.h>
 #include <math.h>
-
-void init_rng()
-{
-    srand(time(NULL));
-}
-
-int get_random_int(int min, int max)
-{
-    return min + (rand() % (int)(max - min + 1));
-}
-
-float get_random_float(float min, float max)
-{
-    return min + ((float)rand() / ((float)RAND_MAX / (max - min)));
-}
 
 float distance_between_points(float x1, float y1, float x2, float y2)
 {

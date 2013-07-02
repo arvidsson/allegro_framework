@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_DISPLAY *display = NULL;
@@ -12,6 +13,9 @@ ALLEGRO_BITMAP *buffer = NULL;
 int scale_w, scale_h, scale_x, scale_y;
 
 bool done = false;
+bool paused = false;
+bool alt_tab_will_pause = true;
+
 bool keys[ALLEGRO_KEY_MAX] = { false };
 bool keys_pressed[ALLEGRO_KEY_MAX] = { false };
 bool keys_released[ALLEGRO_KEY_MAX] = { false };
@@ -90,14 +94,12 @@ void init_framework(const char *window_title, int display_width, int display_hei
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     
-    // hack: center window if not fullscreen, bug in allegro
-    ALLEGRO_MONITOR_INFO info;
-    if (!al_get_monitor_info(0, &info)) {
-        log_error("Failed to get monitor info");
-    }
-    int midx = (info.x2 - info.x1) / 2;
-    int midy = (info.y2 - info.y1) / 2;
-    al_set_new_window_position (midx - (display_width / 2), midy - (display_height / 2));
+    ALLEGRO_DISPLAY_MODE disp_data;
+    al_get_display_mode(al_get_num_display_modes() - 1, &disp_data);
+    int midx = disp_data.width / 2;
+    int midy = disp_data.height / 2;
+    
+    al_set_new_window_position(midx - (display_width / 2), midy - (display_height / 2));
     
     display = al_create_display(display_width, display_height);
     if (!display) {
@@ -114,6 +116,8 @@ void init_framework(const char *window_title, int display_width, int display_hei
     al_register_event_source(event_queue, al_get_mouse_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
+    
+    srand(time(NULL));
     
     black_color = al_map_rgb(0, 0, 0);
     white_color = al_map_rgb(255, 255, 255);
@@ -144,7 +148,7 @@ void destroy_framework()
     }
 }
 
-void setup_viewport(int width, int height, bool use_buffer_bitmap);
+void setup_viewport(int width, int height, bool use_buffer_bitmap)
 {
     if (use_buffer_bitmap) {
         buffer = al_create_bitmap(width, height);
@@ -181,6 +185,11 @@ void setup_viewport(int width, int height, bool use_buffer_bitmap);
     }
 }
 
+void alt_tab_should_pause(bool yesno)
+{
+    alt_tab_will_pause = yesno;
+}
+
 void run_game_loop(void (*update_proc)(), void (*draw_proc)())
 {
     bool redraw = true;
@@ -191,13 +200,11 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
         al_wait_for_event(event_queue, &event);
         
         switch (event.type) {
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                done = true;
-                break;
-            
             case ALLEGRO_EVENT_TIMER:
                 redraw = true;
-                update_proc();
+                if (!paused) {
+                    update_proc();
+                }
                 memset(keys_pressed, false, sizeof(keys_pressed));
                 memset(keys_released, false, sizeof(keys_pressed));
                 memset(mouse_buttons_pressed, false, sizeof(mouse_buttons_pressed));
@@ -231,9 +238,32 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
                 mouse_buttons[event.mouse.button] = false;
                 mouse_buttons_released[event.mouse.button] = true;
                 break;
+            
+            case ALLEGRO_EVENT_KEY_CHAR:
+                if (/*event.keyboard.modifiers == ALLEGRO_KEYMOD_ALT && */
+                    event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                    al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, !(al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW));
+                }
+                break;
+            
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                done = true;
+                break;
+            
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+                if (alt_tab_will_pause) {
+                    paused = true;
+                }
+                break;
+            
+            case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+                if (alt_tab_will_pause) {
+                    paused = false;
+                }
+                break;
         }
         
-        if (redraw && al_is_event_queue_empty(event_queue)) {
+        if (redraw && al_is_event_queue_empty(event_queue) && !paused) {
             redraw = false;
             if (buffer) {
                 al_set_target_bitmap(buffer);
@@ -325,6 +355,16 @@ int wait_for_keypress()
         al_wait_for_event(event_queue, &event);
     } while (event.type != ALLEGRO_EVENT_KEY_DOWN);
     return event.keyboard.keycode;
+}
+
+int get_random_int(int min, int max)
+{
+    return min + (rand() % (int)(max - min + 1));
+}
+
+float get_random_float(float min, float max)
+{
+    return min + ((float)rand() / ((float)RAND_MAX / (max - min)));
 }
 
 ALLEGRO_FONT* get_default_font()

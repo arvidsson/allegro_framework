@@ -1,14 +1,13 @@
-// gcc basic_example.c allegro_framework.c -o basic_example -lallegro-5.0.8-monolith-mt-debug -std=c99 -Wall
-
+// example: a bouncing rectangle
 #include "allegro_framework.h"
 
 typedef struct {
     float x, y;
     float w, h;
     float dx, dy;
-} Rect;
+} rectangle;
 
-Rect r = { 100, 100, 100, 100, 3, 3 };
+rectangle r = { 50, 50, 50, 50, 3, 3 };
 
 void update()
 {
@@ -22,6 +21,7 @@ void update()
     if (r.x < 0 || r.x + r.w > get_window_width()) {
         r.dx = -r.dx;
     }
+    
     if (r.y < 0 || r.y + r.h > get_window_height()) {
         r.dy = -r.dy;
     }
@@ -34,8 +34,20 @@ void draw()
 
 int main()
 {
-    init_framework("basic example", 640, 480, false);
+    /* must be called first! */
+    init_framework("example", 640, 480, false);
+    
+    /* optional, setup viewport to achieve resolution independence */
+    setup_viewport(320, 240, false);
+    
+    /* optional, setup alt-tab behavior (true by default) */
+    alt_tab_should_pause(false);
+    
+    /* the game loop runs until we call quit() */
     run_game_loop(update, draw);
+    
+    /* optional, called automatically when program ends */
+    destroy_framework();
     
     return 0;
 }

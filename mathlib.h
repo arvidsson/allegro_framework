@@ -37,21 +37,6 @@ typedef struct {
 } velocity;
 
 /*
-    Initializes the rng with the current time as seed.
- */
-void init_rng();
-
-/*
-    Returns a random integer between [min, max].
- */
-int get_random_int(int min, int max);
-
-/*
-    Returns a random float between [min, max].
- */
-float get_random_float(float min, float max);
-
-/*
     Return the distance between two points.
  */
 float distance_between_points(float x1, float y1, float x2, float y2);

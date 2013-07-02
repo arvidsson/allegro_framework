@@ -49,7 +49,14 @@ void destroy_framework();
     Sets up a viewport using either a transformation or a buffer bitmap.
     Use this to achieve resolution independence.
  */
-void setup_viewport(int width, int height, bool use_buffer_bitmap = false);
+void setup_viewport(int width, int height, bool use_buffer_bitmap);
+
+/*
+    Determines alt-tab behavior (switching out & in from an application).
+    If enabled, the game logic and rendering will pause until the application
+    becomes active again.
+ */
+void alt_tab_should_pause(bool yesno);
 
 /*
     Runs the game loop; the heart of the game!
@@ -133,6 +140,16 @@ bool is_mouse_button_released(int mouse_button);
     It returns the keycode of the key that was pressed.
  */
 int wait_for_keypress();
+
+/*
+    Returns a random integer between [min, max].
+ */
+int get_random_int(int min, int max);
+
+/*
+    Returns a random float between [min, max].
+ */
+float get_random_float(float min, float max);
 
 /*
     Returns a default font you can use for debugging purposes for example.

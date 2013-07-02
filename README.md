@@ -3,7 +3,7 @@ allegro_framework
 
 A small framework written in C for use with the Allegro 5 library.
 
-See `allegro_framework.h` or the example program(s) for more detailed documentation of the framework.
+See `allegro_framework.h` or the example program for more detailed documentation of the framework.
 
 Features
 --------
@@ -36,16 +36,19 @@ If you design the game for a specific resolution, the framework will automatical
 graphics according to how you set it up. You can either rely on a second buffer bitmap by calling `setup_viewport()` where `use_buffer_bitmap = true` (best for bitmap heavy games), or a
 transformation by calling `setup_viewport()` where `use_buffer_bitmap = false` (best for games relying a lot on drawing primitives). Call that function **after** `init_framework()`.
 
-### Misc utility functions ###
+### Misc ###
 
-Waiting for a keypress, random number generation, basic 2d collision detection, ...
+* Waiting for keypress function.
+* Basic random number generation (using `rand()`).
+* Alt-tab behavior (whether the game should pause when it's not in focus).
+* Alt-Enter toggles fullscreen mode.
+
+### Mathlib ###
+
+An extension to the framework. Useful constants, structs and functions for detecting collisions. Found in `mathlib.h` and `mathlib.c`.
 
 Planned features
 ----------------
 
-+ Alt-tabbing
-+ Simplifying input handling
-+ Toggle fullscreen mode
-+ Handling other display related tasks
-+ Alternative game loop using fixed timestep
-+ More extensive examples
++ Simplifying input handling (generic).
++ Alternative game loop using fixed timestep.
