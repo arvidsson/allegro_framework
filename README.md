@@ -51,4 +51,6 @@ Planned features
 ----------------
 
 + Simplifying input handling (generic).
++ Input combos
++ Duration of pressed keys/input
 + Alternative game loop using fixed timestep.

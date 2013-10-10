@@ -1,5 +1,5 @@
-#ifndef ALLEGRO_FRAMEWORK_H
-#define ALLEGRO_FRAMEWORK_H
+#ifndef INCLUDED_ALLEGRO_FRAMEWORK_H
+#define INCLUDED_ALLEGRO_FRAMEWORK_H
 
 #ifdef __cplusplus
    extern "C" {
@@ -37,7 +37,7 @@ void write_logfile(int log_level, const char *format, ...);
     Initializes the framework.
     This must be called before you use anything else in this framework!
  */
-void init_framework(const char *window_title, int display_width, int display_height, bool fullscreen);
+void init_framework(const char *window_title, int window_width, int window_height, bool fullscreen);
 
 /*
     Destroys everything we need to clean up when it is time to quit the program.
@@ -52,19 +52,24 @@ void destroy_framework();
 void setup_viewport(int width, int height, bool use_buffer_bitmap);
 
 /*
-    Determines alt-tab behavior (switching out & in from an application).
-    If enabled, the game logic and rendering will pause until the application
+    Sets alt-tab behavior (switching out & in from an application).
+    If enabled, the game logic and rendering will pause until the game
     becomes active again.
  */
 void alt_tab_should_pause(bool yesno);
 
 /*
     Runs the game loop; the heart of the game!
+    
+    update_proc() and draw_proc() are function pointers you need to define yourself.
+    Will call update_proc() 60 times per second.
+    Will call draw_proc() 60 times a second if there is no other events to deal with.
+    If there is nothing else to do, the game loop will sleep.
  */
 void run_game_loop(void (*update_proc)(), void (*draw_proc)());
 
 /*
-    Will make the game loop stop running.
+    Stops the game loop.
  */
 void quit();
 
@@ -77,6 +82,16 @@ int get_window_width();
     Returns the height of the window.
  */
 int get_window_height();
+
+/*
+    Returns the width of the viewport.
+ */
+int get_viewport_width();
+
+/*
+    Returns the height of the viewport.
+ */
+int get_viewport_height();
 
 /*
     Returns true if a key on the keyboard is held down.
@@ -93,6 +108,7 @@ bool is_key_pressed(int keycode);
  */
 bool is_key_released(int keycode);
 
+// helper mouse input enum
 enum {
     MOUSE_LEFT_BUTTON,
     MOUSE_RIGHT_BUTTON,
@@ -111,12 +127,12 @@ int get_mouse_x();
 int get_mouse_y();
 
 /*
-    Returns mouse delta movement in x.
+    Returns mouse delta movement in x since last frame.
  */
 int get_mouse_dx();
 
 /*
-    Returns mouse delta movement in y.
+    Returns mouse delta movement in y since last frame.
  */
 int get_mouse_dy();
 
@@ -137,7 +153,7 @@ bool is_mouse_button_released(int mouse_button);
 
 /*
     Waits until a key is pressed on the keyboard.
-    It returns the keycode of the key that was pressed.
+    Returns the keycode of the key that was pressed.
  */
 int wait_for_keypress();
 
@@ -152,7 +168,7 @@ int get_random_int(int min, int max);
 float get_random_float(float min, float max);
 
 /*
-    Returns a default font you can use for debugging purposes for example.
+    Returns a default font. Mainly used for debugging purposes.
  */
 ALLEGRO_FONT* get_default_font();
 

@@ -1,3 +1,4 @@
+// gcc example.c allegro_framework.c -o example `pkg-config --libs --cflags allegro-5.0 allegro_main-5.0 allegro_primitives-5.0 allegro_font-5.0 allegro_image-5.0`
 // example: a bouncing rectangle
 #include "allegro_framework.h"
 
@@ -18,11 +19,11 @@ void update()
     r.x += r.dx;
     r.y += r.dy;
     
-    if (r.x < 0 || r.x + r.w > get_window_width()) {
+    if (r.x < 0 || r.x + r.w > get_viewport_width()) {
         r.dx = -r.dx;
     }
     
-    if (r.y < 0 || r.y + r.h > get_window_height()) {
+    if (r.y < 0 || r.y + r.h > get_viewport_height()) {
         r.dy = -r.dy;
     }
 }
