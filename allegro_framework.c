@@ -4,17 +4,6 @@
 #include <string.h>
 #include <time.h>
 
-<<<<<<< HEAD
-ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-ALLEGRO_DISPLAY *display = NULL;
-ALLEGRO_TIMER *timer = NULL;
-ALLEGRO_FILE *logfile = NULL;
-ALLEGRO_FONT *default_font = NULL;
-ALLEGRO_BITMAP *buffer = NULL;
-int scale_w, scale_h, scale_x, scale_y;
-bool is_using_buffer_bitmap = false;
-int viewport_width, viewport_height;
-=======
 static ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 static ALLEGRO_DISPLAY *display = NULL;
 static ALLEGRO_TIMER *timer = NULL;
@@ -22,7 +11,8 @@ static ALLEGRO_FILE *logfile = NULL;
 static ALLEGRO_FONT *default_font = NULL;
 static ALLEGRO_BITMAP *buffer = NULL;
 static int scale_w, scale_h, scale_x, scale_y;
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
+static bool is_using_buffer_bitmap = false;
+static int viewport_width, viewport_height;
 
 static bool is_done = false;
 static bool is_paused = false;
@@ -89,33 +79,17 @@ void init_framework(const char *window_title, int window_width, int window_heigh
     if (!event_queue)
         log_error("Failed to create event queue");
     
-<<<<<<< HEAD
-    if (fullscreen) {
-        al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-    }
-    else {
-        al_set_new_display_flags(ALLEGRO_WINDOWED);
-    }
-=======
     if (fullscreen)
         al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
     else
         al_set_new_display_flags(ALLEGRO_WINDOWED);
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
     
     //al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
     //al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     
-<<<<<<< HEAD
-    display = al_create_display(display_width, display_height);
-    if (!display) {
-        log_error("Failed to create display @ %dx%d", display_width, display_height);
-    }
-=======
     display = al_create_display(window_width, window_height);
     if (!display)
         log_error("Failed to create display @ %dx%d", window_width, window_height);
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
     al_set_window_title(display, window_title);
     viewport_width = get_window_width();
     viewport_height = get_window_height();
@@ -139,45 +113,30 @@ void init_framework(const char *window_title, int window_width, int window_heigh
 
 void destroy_framework()
 {
-    if (default_font)
+    if (default_font) {
         al_destroy_font(default_font);
-<<<<<<< HEAD
         default_font = NULL;
     }
-=======
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
     
-    if (timer)
+    if (timer) {
         al_destroy_timer(timer);
-<<<<<<< HEAD
         timer = NULL;
     }
-=======
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
     
-    if (display)
+    if (display) {
         al_destroy_display(display);
-<<<<<<< HEAD
         display = NULL;
     }
-=======
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
     
-    if (event_queue)
+    if (event_queue) {
         al_destroy_event_queue(event_queue);
-<<<<<<< HEAD
         event_queue = NULL;
     }
-=======
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
     
-    if (logfile)
+    if (logfile) {
         al_fclose(logfile);
-<<<<<<< HEAD
         logfile = NULL;
     }
-=======
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
 }
 
 void setup_viewport(int width, int height, bool use_buffer_bitmap)
@@ -237,13 +196,8 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
         
         switch (event.type) {
             case ALLEGRO_EVENT_TIMER:
-<<<<<<< HEAD
-            	redraw = true;
-                if (!paused) {
-=======
                 should_redraw = true;
                 if (!is_paused)
->>>>>>> b236083516499294a3726d2c3076b7b5e3512e12
                     update_proc();
                 memset(keys_pressed, false, sizeof(keys_pressed));
                 memset(keys_released, false, sizeof(keys_pressed));
