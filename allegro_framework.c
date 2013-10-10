@@ -12,7 +12,7 @@ static ALLEGRO_FONT *default_font = NULL;
 static ALLEGRO_BITMAP *buffer = NULL;
 static int scale_w, scale_h, scale_x, scale_y;
 static bool is_using_buffer_bitmap = false;
-static int viewport_width, viewport_height;
+static int viewport_width = 0, viewport_height = 0;
 
 static bool is_done = false;
 static bool is_paused = false;
@@ -118,6 +118,11 @@ void destroy_framework()
         default_font = NULL;
     }
     
+    if (buffer) {
+        al_destroy_bitmap(buffer);
+        buffer = NULL;
+    }
+    
     if (timer) {
         al_destroy_timer(timer);
         timer = NULL;
@@ -141,7 +146,7 @@ void destroy_framework()
 
 void setup_viewport(int width, int height, bool use_buffer_bitmap)
 {
-	is_using_buffer_bitmap = use_buffer_bitmap;
+    is_using_buffer_bitmap = use_buffer_bitmap;
 	
     if (use_buffer_bitmap) {
         buffer = al_create_bitmap(width, height);
@@ -220,7 +225,8 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
                 if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_ALT) &&
                     event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
                     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, !(al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW));
-                    setup_viewport(viewport_width, viewport_height, is_using_buffer_bitmap);
+                    if (viewport_width != 0 && viewport_height != 0)
+                        setup_viewport(viewport_width, viewport_height, is_using_buffer_bitmap);
                 }
                 break;
             
@@ -247,12 +253,12 @@ void run_game_loop(void (*update_proc)(), void (*draw_proc)())
             
             case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
                 if (should_alt_tab_pause)
-                    paused = true;
+                    is_paused = true;
                 break;
             
             case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
                 if (should_alt_tab_pause)
-                    paused = false;
+                    is_paused = false;
                 break;
         }
         
