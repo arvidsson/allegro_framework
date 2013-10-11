@@ -34,6 +34,9 @@ void write_logfile(int log_level, const char *format, ...)
 {
     char buffer[4096];
     
+    if (!logfile)
+        logfile = al_fopen("log.txt", "w");
+    
     if (log_level == LOG_WARNING)
         al_fputs(logfile, "WARNING: ");
     else if (log_level == LOG_ERROR)
@@ -53,8 +56,6 @@ void write_logfile(int log_level, const char *format, ...)
 
 void init_framework(const char *window_title, int window_width, int window_height, bool fullscreen)
 {
-    logfile = al_fopen("log.txt", "w");
-    
     if (!al_init())
         log_error("Failed to initialize allegro");
     
