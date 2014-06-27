@@ -37,6 +37,11 @@ typedef struct {
 } velocity;
 
 /*
+    Return the angle between two points.
+ */
+float angle_between_points(float x1, float y1, float x2, float y2);
+
+/*
     Return the distance between two points.
  */
 float distance_between_points(float x1, float y1, float x2, float y2);

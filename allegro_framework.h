@@ -152,6 +152,16 @@ int get_random_int(int min, int max);
 float get_random_float(float min, float max);
 
 /*
+    Returns true if the random number is one in x.
+ */
+bool one_in(int chance);
+
+/*
+    Returns the result of rolling dice with a number of sides.
+*/
+int roll_dice(int number, int sides);
+
+/*
     Returns a default font. Mainly used for debugging purposes.
  */
 ALLEGRO_FONT* get_default_font();

@@ -303,6 +303,21 @@ float get_random_float(float min, float max)
     return min + ((float)rand() / ((float)RAND_MAX / (max - min)));
 }
 
+bool one_in(int chance)
+{
+    if (get_random_int(0, chance - 1) == 0)
+        return true;
+    return false;
+}
+
+int roll_dice(int number, int sides)
+{
+    int result = 0;
+    for (int i = 0; i < number; i++)
+        result += get_random_int(1, sides);
+    return result;
+}
+
 ALLEGRO_FONT* get_default_font()
 {
     return default_font;
