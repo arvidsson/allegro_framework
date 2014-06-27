@@ -29,7 +29,7 @@ enum {
 
 /*
     Writes a message to the logfile.
-    Use the macros above instead of using this function directly. 
+    Use the macros above instead of using this function directly.
  */
 void write_logfile(int log_level, const char *format, ...);
 
@@ -46,27 +46,21 @@ void init_framework(const char *window_title, int window_width, int window_heigh
 void destroy_framework();
 
 /*
-    Sets up a viewport using either a transformation or a buffer bitmap.
-    Use this to achieve resolution independence.
- */
-void setup_viewport(int width, int height, bool use_buffer_bitmap);
-
-/*
     Sets alt-tab behavior (switching out & in from an application).
     If enabled, the game logic and rendering will pause until the game
-    becomes active again.
+    becomes active again. This is enabled by default.
  */
-void alt_tab_should_pause(bool yesno);
+void alt_tab_should_pause(bool true_or_false);
 
 /*
     Runs the game loop; the heart of the game!
-    
+
     update_proc() and draw_proc() are function pointers you need to define yourself.
     Will call update_proc() 60 times per second.
-    Will call draw_proc() 60 times a second if there is no other events to deal with.
+    Will call render_proc() 60 times a second if there is no other events to deal with.
     If there is nothing else to do, the game loop will sleep.
  */
-void run_game_loop(void (*update_proc)(), void (*draw_proc)());
+void run_game_loop(void (*update_proc)(), void (*render_proc)());
 
 /*
     Stops the game loop.
@@ -82,16 +76,6 @@ int get_window_width();
     Returns the height of the window.
  */
 int get_window_height();
-
-/*
-    Returns the width of the viewport.
- */
-int get_viewport_width();
-
-/*
-    Returns the height of the viewport.
- */
-int get_viewport_height();
 
 /*
     Returns true if a key on the keyboard is held down.
