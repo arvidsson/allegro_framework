@@ -30,11 +30,10 @@ and a display.
 `run_game_loop()` starts the game loop. This function will call the two callbacks that you provide to the function until you
 ask the game to quit.
 
-### Resolution independence ###
+## Simplified input ###
 
-If you design the game for a specific resolution, the framework will automatically take care of rescaling
-graphics according to how you set it up. You can either rely on a second buffer bitmap by calling `setup_viewport()` where `use_buffer_bitmap = true` (best for bitmap heavy games), or a
-transformation by calling `setup_viewport()` where `use_buffer_bitmap = false` (best for games relying a lot on drawing primitives). Call that function **after** `init_framework()`.
+The input from keyboard and mouse is polled each frame. Functions, such as `is_key_down()`, should be used in the update method defined
+by the user in order to check for the input.
 
 ### Misc ###
 
@@ -53,4 +52,5 @@ Planned features
 + Simplifying input handling (generic).
 + Input combos
 + Duration of pressed keys/input
-+ Alternative game loop using fixed timestep.
++ Alternative game loop using fixed timestep
++ Sprite objects
