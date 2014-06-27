@@ -30,7 +30,7 @@ and a display.
 `run_game_loop()` starts the game loop. This function will call the two callbacks that you provide to the function until you
 ask the game to quit.
 
-## Simplified input ###
+### Simplified input ###
 
 The input from keyboard and mouse is polled each frame. Functions, such as `is_key_down()`, should be used in the update method defined
 by the user in order to check for the input.
