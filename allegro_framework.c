@@ -26,6 +26,23 @@ static bool mouse_buttons_released[MAX_MOUSE_BUTTONS] = { false };
 
 ALLEGRO_COLOR black_color;
 ALLEGRO_COLOR white_color;
+ALLEGRO_COLOR dark_grey;
+ALLEGRO_COLOR grey;
+ALLEGRO_COLOR light_grey;
+ALLEGRO_COLOR red;
+ALLEGRO_COLOR green;
+ALLEGRO_COLOR dark_green;
+ALLEGRO_COLOR blue;
+ALLEGRO_COLOR yellow;
+ALLEGRO_COLOR cyan;
+ALLEGRO_COLOR magenta;
+ALLEGRO_COLOR maroon;
+ALLEGRO_COLOR purple;
+ALLEGRO_COLOR lime;
+ALLEGRO_COLOR olive;
+ALLEGRO_COLOR navy;
+ALLEGRO_COLOR teal;
+ALLEGRO_COLOR brown;
 
 void write_logfile(int log_level, const char *format, ...)
 {
@@ -51,10 +68,20 @@ void write_logfile(int log_level, const char *format, ...)
         exit(1);
 }
 
-void init_framework(const char *window_title, int window_width, int window_height, bool fullscreen)
+void init_framework(const char *title, int window_width, int window_height, bool fullscreen)
 {
     if (!al_init())
         log_error("Failed to initialize allegro");
+	
+	atexit(destroy_framework);
+		
+	al_set_exe_name(title);
+	al_set_app_name(title);
+	
+	// set correct resource directory
+	ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	al_change_directory(al_path_cstr(path, '/'));
+	al_destroy_path(path);
 
     if (!al_install_keyboard())
         log_error("Failed to install keyboard");
@@ -88,7 +115,7 @@ void init_framework(const char *window_title, int window_width, int window_heigh
     display = al_create_display(window_width, window_height);
     if (!display)
         log_error("Failed to create display @ %dx%d", window_width, window_height);
-    al_set_window_title(display, window_title);
+    al_set_window_title(display, title);
 
     timer = al_create_timer(1.0 / 60);
     if (!timer)
@@ -101,10 +128,26 @@ void init_framework(const char *window_title, int window_width, int window_heigh
 
     srand(time(NULL));
 
+	// initialize default colors
     black_color = al_map_rgb(0, 0, 0);
     white_color = al_map_rgb(255, 255, 255);
-
-    atexit(destroy_framework);
+	dark_grey   = al_map_rgb(64, 64, 64);
+	grey        = al_map_rgb(128, 128, 128);
+	light_grey  = al_map_rgb(192, 192, 192);
+	red         = al_map_rgb(255, 0, 0);
+	green       = al_map_rgb(0, 255, 0);
+	dark_green  = al_map_rgb(0, 100, 0);
+	blue        = al_map_rgb(0, 0, 255);
+	yellow      = al_map_rgb(255, 255, 0);
+	cyan        = al_map_rgb(0, 255, 255);
+	magenta     = al_map_rgb(255, 0, 255);
+	maroon      = al_map_rgb(128, 0, 0);
+	purple      = al_map_rgb(128, 0, 128);
+	lime        = al_map_rgb(191, 255, 0);
+	olive       = al_map_rgb(128, 128, 0);
+	navy        = al_map_rgb(0, 0, 128);
+	teal        = al_map_rgb(0, 128, 128);
+	brown       = al_map_rgb(101, 55, 0);
 }
 
 void destroy_framework()

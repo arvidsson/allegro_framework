@@ -37,7 +37,7 @@ void write_logfile(int log_level, const char *format, ...);
     Initializes the framework.
     This must be called before you use anything else in this framework!
  */
-void init_framework(const char *window_title, int window_width, int window_height, bool fullscreen);
+void init_framework(const char *title, int window_width, int window_height, bool fullscreen);
 
 /*
     Destroys everything we need to clean up when it is time to quit the program.
@@ -171,6 +171,23 @@ ALLEGRO_FONT* get_default_font();
  */
 extern ALLEGRO_COLOR black_color;
 extern ALLEGRO_COLOR white_color;
+extern ALLEGRO_COLOR dark_grey;
+extern ALLEGRO_COLOR grey;
+extern ALLEGRO_COLOR light_grey;
+extern ALLEGRO_COLOR red;
+extern ALLEGRO_COLOR green;
+extern ALLEGRO_COLOR dark_green;
+extern ALLEGRO_COLOR blue;
+extern ALLEGRO_COLOR yellow;
+extern ALLEGRO_COLOR cyan;
+extern ALLEGRO_COLOR magenta;
+extern ALLEGRO_COLOR maroon;
+extern ALLEGRO_COLOR purple;
+extern ALLEGRO_COLOR lime;
+extern ALLEGRO_COLOR olive;
+extern ALLEGRO_COLOR navy;
+extern ALLEGRO_COLOR teal;
+extern ALLEGRO_COLOR brown;
 
 #ifdef __cplusplus
    }
