@@ -26,23 +26,23 @@ static bool mouse_buttons_released[MAX_MOUSE_BUTTONS] = { false };
 
 ALLEGRO_COLOR black_color;
 ALLEGRO_COLOR white_color;
-ALLEGRO_COLOR dark_grey;
-ALLEGRO_COLOR grey;
-ALLEGRO_COLOR light_grey;
-ALLEGRO_COLOR red;
-ALLEGRO_COLOR green;
-ALLEGRO_COLOR dark_green;
-ALLEGRO_COLOR blue;
-ALLEGRO_COLOR yellow;
-ALLEGRO_COLOR cyan;
-ALLEGRO_COLOR magenta;
-ALLEGRO_COLOR maroon;
-ALLEGRO_COLOR purple;
-ALLEGRO_COLOR lime;
-ALLEGRO_COLOR olive;
-ALLEGRO_COLOR navy;
-ALLEGRO_COLOR teal;
-ALLEGRO_COLOR brown;
+ALLEGRO_COLOR dark_grey_color;
+ALLEGRO_COLOR grey_color;
+ALLEGRO_COLOR light_grey_color;
+ALLEGRO_COLOR red_color;
+ALLEGRO_COLOR green_color;
+ALLEGRO_COLOR dark_green_color;
+ALLEGRO_COLOR blue_color;
+ALLEGRO_COLOR yellow_color;
+ALLEGRO_COLOR cyan_color;
+ALLEGRO_COLOR magenta_color;
+ALLEGRO_COLOR maroon_color;
+ALLEGRO_COLOR purple_color;
+ALLEGRO_COLOR lime_color;
+ALLEGRO_COLOR olive_color;
+ALLEGRO_COLOR navy_color;
+ALLEGRO_COLOR teal_color;
+ALLEGRO_COLOR brown_color;
 
 void write_logfile(int log_level, const char *format, ...)
 {
@@ -129,25 +129,25 @@ void init_framework(const char *title, int window_width, int window_height, bool
     srand(time(NULL));
 
 	// initialize default colors
-    black_color = al_map_rgb(0, 0, 0);
-    white_color = al_map_rgb(255, 255, 255);
-	dark_grey   = al_map_rgb(64, 64, 64);
-	grey        = al_map_rgb(128, 128, 128);
-	light_grey  = al_map_rgb(192, 192, 192);
-	red         = al_map_rgb(255, 0, 0);
-	green       = al_map_rgb(0, 255, 0);
-	dark_green  = al_map_rgb(0, 100, 0);
-	blue        = al_map_rgb(0, 0, 255);
-	yellow      = al_map_rgb(255, 255, 0);
-	cyan        = al_map_rgb(0, 255, 255);
-	magenta     = al_map_rgb(255, 0, 255);
-	maroon      = al_map_rgb(128, 0, 0);
-	purple      = al_map_rgb(128, 0, 128);
-	lime        = al_map_rgb(191, 255, 0);
-	olive       = al_map_rgb(128, 128, 0);
-	navy        = al_map_rgb(0, 0, 128);
-	teal        = al_map_rgb(0, 128, 128);
-	brown       = al_map_rgb(101, 55, 0);
+    black_color       = al_map_rgb(0, 0, 0);
+    white_color       = al_map_rgb(255, 255, 255);
+	dark_grey_color   = al_map_rgb(64, 64, 64);
+	grey_color        = al_map_rgb(128, 128, 128);
+	light_grey_color  = al_map_rgb(192, 192, 192);
+	red_color         = al_map_rgb(255, 0, 0);
+	green_color       = al_map_rgb(0, 255, 0);
+	dark_green_color  = al_map_rgb(0, 100, 0);
+	blue_color        = al_map_rgb(0, 0, 255);
+	yellow_color      = al_map_rgb(255, 255, 0);
+	cyan_color        = al_map_rgb(0, 255, 255);
+	magenta_color     = al_map_rgb(255, 0, 255);
+	maroon_color      = al_map_rgb(128, 0, 0);
+	purple_color      = al_map_rgb(128, 0, 128);
+	lime_color        = al_map_rgb(191, 255, 0);
+	olive_color       = al_map_rgb(128, 128, 0);
+	navy_color        = al_map_rgb(0, 0, 128);
+	teal_color        = al_map_rgb(0, 128, 128);
+	brown_color       = al_map_rgb(101, 55, 0);
 }
 
 void destroy_framework()

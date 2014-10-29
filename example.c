@@ -19,18 +19,18 @@ void update()
     r.x += r.dx;
     r.y += r.dy;
 
-    if (r.x < 0 || r.x + r.w > get_viewport_width()) {
+    if (r.x < 0 || r.x + r.w > get_window_width()) {
         r.dx = -r.dx;
     }
 
-    if (r.y < 0 || r.y + r.h > get_viewport_height()) {
+    if (r.y < 0 || r.y + r.h > get_window_height()) {
         r.dy = -r.dy;
     }
 }
 
 void render()
 {
-    al_draw_filled_rectangle(r.x, r.y, r.x + r.w, r.y + r.h, al_map_rgb(255, 0, 0));
+    al_draw_filled_rectangle(r.x, r.y, r.x + r.w, r.y + r.h, red_color);
 }
 
 int main()

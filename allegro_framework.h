@@ -171,23 +171,23 @@ ALLEGRO_FONT* get_default_font();
  */
 extern ALLEGRO_COLOR black_color;
 extern ALLEGRO_COLOR white_color;
-extern ALLEGRO_COLOR dark_grey;
-extern ALLEGRO_COLOR grey;
-extern ALLEGRO_COLOR light_grey;
-extern ALLEGRO_COLOR red;
-extern ALLEGRO_COLOR green;
-extern ALLEGRO_COLOR dark_green;
-extern ALLEGRO_COLOR blue;
-extern ALLEGRO_COLOR yellow;
-extern ALLEGRO_COLOR cyan;
-extern ALLEGRO_COLOR magenta;
-extern ALLEGRO_COLOR maroon;
-extern ALLEGRO_COLOR purple;
-extern ALLEGRO_COLOR lime;
-extern ALLEGRO_COLOR olive;
-extern ALLEGRO_COLOR navy;
-extern ALLEGRO_COLOR teal;
-extern ALLEGRO_COLOR brown;
+extern ALLEGRO_COLOR dark_grey_color;
+extern ALLEGRO_COLOR grey_color;
+extern ALLEGRO_COLOR light_grey_color;
+extern ALLEGRO_COLOR red_color;
+extern ALLEGRO_COLOR green_color;
+extern ALLEGRO_COLOR dark_green_color;
+extern ALLEGRO_COLOR blue_color;
+extern ALLEGRO_COLOR yellow_color;
+extern ALLEGRO_COLOR cyan_color;
+extern ALLEGRO_COLOR magenta_color;
+extern ALLEGRO_COLOR maroon_color;
+extern ALLEGRO_COLOR purple_color;
+extern ALLEGRO_COLOR lime_color;
+extern ALLEGRO_COLOR olive_color;
+extern ALLEGRO_COLOR navy_color;
+extern ALLEGRO_COLOR teal_color;
+extern ALLEGRO_COLOR brown_color;
 
 #ifdef __cplusplus
    }
