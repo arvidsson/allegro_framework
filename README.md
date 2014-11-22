@@ -3,7 +3,8 @@ allegro_framework
 
 A small framework written in C for use with the Allegro 5 library.
 
-See `allegro_framework.h` or the example program for more detailed documentation of the framework.
+See `allegro_framework.h` for more detailed documentation of the framework,
+and the example below for a quick intro on how to use it.
 
 Features
 --------
@@ -35,22 +36,68 @@ ask the game to quit.
 The input from keyboard and mouse is polled each frame. Functions, such as `is_key_down()`, should be used in the update method defined
 by the user in order to check for the input.
 
+### Random number generation ###
+
+* Uses `rand()`, and `srand()` is called in `init_framework()`.
+* Random number generation between a range (e.g. `get_random_int()`).
+* `one_in()` and `roll_dice()`
+
 ### Misc ###
 
 * Waiting for keypress function.
-* Basic random number generation (using `rand()`).
 * Alt-tab behavior (whether the game should pause when it's not in focus).
-* Alt-Enter toggles fullscreen mode.
+* Alt-enter toggles fullscreen mode.
 
 ### Mathlib ###
 
 An extension to the framework. Useful constants, structs and functions for detecting collisions. Found in `mathlib.h` and `mathlib.c`.
 
-Planned features
-----------------
+example
+-------
 
-+ Simplifying input handling (generic).
-+ Input combos
-+ Duration of pressed keys/input
-+ Alternative game loop using fixed timestep
-+ Sprite objects
+```c++
+// example: a bouncing rectangle
+#include "allegro_framework.h"
+
+typedef struct {
+    float x, y;
+    float w, h;
+    float dx, dy;
+} Rectangle;
+
+Rectangle r = { 50, 50, 50, 50, 3, 3 };
+
+void update()
+{
+    if (is_key_down(ALLEGRO_KEY_ESCAPE)) {
+        quit();
+    }
+
+    r.x += r.dx;
+    r.y += r.dy;
+
+    if (r.x < 0 || r.x + r.w > get_window_width()) {
+        r.dx = -r.dx;
+    }
+
+    if (r.y < 0 || r.y + r.h > get_window_height()) {
+        r.dy = -r.dy;
+    }
+}
+
+void render()
+{
+    al_draw_filled_rectangle(r.x, r.y, r.x + r.w, r.y + r.h, red_color);
+}
+
+int main(int argc, char *argv[])
+{
+    // must be called first!
+    init_framework("example", 640, 480, false);
+
+    // the game loop runs until we call quit()
+    run_game_loop(update, render);
+
+    return 0;
+}
+```

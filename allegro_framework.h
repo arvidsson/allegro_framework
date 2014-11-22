@@ -11,7 +11,7 @@
 #include <allegro5/allegro_image.h>
 
 /*
-    Logging macros. Usage:
+    Logging macros.
     - log_message: for debug messages
     - log_warning: for non-fatal errors, i.e. continue program execution
     - log_error:   for fatal errors, program will be forcefully terminated
@@ -29,13 +29,18 @@ enum {
 
 /*
     Writes a message to the logfile.
-    Use the macros above instead of using this function directly.
+    Use the logging macros above instead of using this function directly.
  */
 void write_logfile(int log_level, const char *format, ...);
 
 /*
     Initializes the framework.
     This must be called before you use anything else in this framework!
+
+    title: the window title
+    window_width: the width of the window
+    window_height: the height of the window
+    fullscreen: whether to start in fullscreen or not
  */
 void init_framework(const char *title, int window_width, int window_height, bool fullscreen);
 
@@ -62,34 +67,22 @@ void alt_tab_should_pause(bool true_or_false);
  */
 void run_game_loop(void (*update_proc)(), void (*render_proc)());
 
-/*
-    Stops the game loop.
- */
+// Stops the game loop.
 void quit();
 
-/*
-    Returns the width of the window.
- */
+// Returns the width of the window.
 int get_window_width();
 
-/*
-    Returns the height of the window.
- */
+// Returns the height of the window.
 int get_window_height();
 
-/*
-    Returns true if a key on the keyboard is held down.
- */
+// Returns true if a key on the keyboard is held down.
 bool is_key_down(int keycode);
 
-/*
-    Returns true if a key on the keyboard was pressed.
- */
+// Returns true if a key on the keyboard was pressed.
 bool is_key_pressed(int keycode);
 
-/*
-    Returns true if a key on the keyboard was released.
- */
+// Returns true if a key on the keyboard was released.
 bool is_key_released(int keycode);
 
 // helper mouse input enum
@@ -100,39 +93,25 @@ enum {
     MAX_MOUSE_BUTTONS
 };
 
-/*
-    Returns mouse x coordinate.
- */
+// Returns mouse x coordinate.
 int get_mouse_x();
 
-/*
-    Returns mouse y coordinate.
- */
+// Returns mouse y coordinate.
 int get_mouse_y();
 
-/*
-    Returns mouse delta movement in x since last frame.
- */
+// Returns mouse delta movement in x since last frame.
 int get_mouse_dx();
 
-/*
-    Returns mouse delta movement in y since last frame.
- */
+// Returns mouse delta movement in y since last frame.
 int get_mouse_dy();
 
-/*
-    Returns true if a mouse button is held down.
- */
+// Returns true if a mouse button is held down.
 bool is_mouse_button_down(int mouse_button);
 
-/*
-    Returns true if a mouse button was pressed.
- */
+// Returns true if a mouse button was pressed.
 bool is_mouse_button_pressed(int mouse_button);
 
-/*
-    Returns true if a mouse button was released.
- */
+// Returns true if a mouse button was released.
 bool is_mouse_button_released(int mouse_button);
 
 /*
@@ -141,34 +120,22 @@ bool is_mouse_button_released(int mouse_button);
  */
 int wait_for_keypress();
 
-/*
-    Returns a random integer between [min, max].
- */
+// Returns a random integer between [min, max].
 int get_random_int(int min, int max);
 
-/*
-    Returns a random float between [min, max].
- */
+// Returns a random float between [min, max].
 float get_random_float(float min, float max);
 
-/*
-    Returns true if the random number is one in x.
- */
+// Returns true if the random number is one in [chance].
 bool one_in(int chance);
 
-/*
-    Returns the result of rolling dice with a number of sides.
-*/
+// Returns the result of rolling dice with a number of sides.
 int roll_dice(int number, int sides);
 
-/*
-    Returns a default font. Mainly used for debugging purposes.
- */
+// Returns a default font. Mainly used for debugging purposes.
 ALLEGRO_FONT* get_default_font();
 
-/*
-    Default colors.
- */
+// Default colors.
 extern ALLEGRO_COLOR black_color;
 extern ALLEGRO_COLOR white_color;
 extern ALLEGRO_COLOR dark_grey_color;
