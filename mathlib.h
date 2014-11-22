@@ -55,11 +55,11 @@ bool circles_intersect(float x1, float y1, float r1, float x2, float y2, float r
 bool circle_contains_point(float x1, float y1, float r, float x2, float y2);
 
 // Variants of the functions using the structs defined above.
-float distance_between_points_ex(const point* p1, const point* p2);
-bool rectangles_intersect_ex(const rect* r1, const rect* r2);
-bool rectangle_contains_point_ex(const rect* r, const point* p);
-bool circles_intersect_ex(const circle* c1, const circle* c2);
-bool circle_contains_point_ex(const circle* c, const point* p);
+float distance_between_points_ex(const Point* p1, const Point* p2);
+bool rectangles_intersect_ex(const Rectangle* r1, const Rectangle* r2);
+bool rectangle_contains_point_ex(const Rectangle* r, const Point* p);
+bool circles_intersect_ex(const Circle* c1, const Circle* c2);
+bool circle_contains_point_ex(const Circle* c, const Point* p);
 
 #ifdef __cplusplus
    }
