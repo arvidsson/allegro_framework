@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <time.h>
 #include <assert.h>
 
@@ -123,9 +124,6 @@ void init_framework(const char *title, int window_width, int window_height, bool
         al_set_new_display_flags(ALLEGRO_WINDOWED);
     }
 
-    //al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
-    //al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
-
     display = al_create_display(window_width, window_height);
     if (!display) {
         log_error("Failed to create display @ %dx%d", window_width, window_height);
@@ -194,11 +192,6 @@ void destroy_framework()
     }
 }
 
-void alt_tab_should_pause(bool true_or_false)
-{
-    should_alt_tab_pause = true_or_false;
-}
-
 void run_game_loop(void (*update_proc)(), void (*render_proc)())
 {
     bool should_redraw = true;
@@ -214,6 +207,8 @@ void run_game_loop(void (*update_proc)(), void (*render_proc)())
                 if (!is_paused) {
                     update_proc();
                 }
+
+                // clear input state
                 memset(keys_pressed, false, sizeof(keys_pressed));
                 memset(keys_released, false, sizeof(keys_pressed));
                 memset(mouse_buttons_pressed, false, sizeof(mouse_buttons_pressed));
@@ -233,6 +228,7 @@ void run_game_loop(void (*update_proc)(), void (*render_proc)())
                 break;
 
             case ALLEGRO_EVENT_KEY_CHAR:
+                // handle alt-tab
                 if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_ALT) &&
                      event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
                     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, !(al_get_display_flags(display) & ALLEGRO_FULLSCREEN_WINDOW));
@@ -284,6 +280,11 @@ void run_game_loop(void (*update_proc)(), void (*render_proc)())
 void quit()
 {
     is_done = true;
+}
+
+void alt_tab_should_pause(bool true_or_false)
+{
+    should_alt_tab_pause = true_or_false;
 }
 
 int get_window_width()
@@ -391,4 +392,71 @@ int roll_dice(int number, int sides)
 ALLEGRO_FONT* get_default_font()
 {
     return default_font;
+}
+
+float angle_between_points(float x1, float y1, float x2, float y2)
+{
+    return atan2(y2 - y1, x2 - x1);
+}
+
+float angle_between_points_ex(Point p1, Point p2)
+{
+    return angle_between_points(p1.x, p1.y, p2.x, p2.y);
+}
+
+float distance_between_points(float x1, float y1, float x2, float y2)
+{
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    return sqrt(dx * dx + dy * dy);
+}
+
+float distance_between_points_ex(Point p1, Point p2)
+{
+    return distance_between_points(p1->x, p1->y, p2->x, p2->y);
+}
+
+bool rectangles_intersect(float l1, float t1, float r1, float b1, float l2, float t2, float r2, float b2)
+{
+    return !(r1 < l2 || b1 < t2 || l1 > r2 || t1 > b2);
+}
+
+bool rectangles_intersect_ex(Rectangle r1, Rectangle r2)
+{
+    return rectangles_intersect(r1->x, r1-y, r1->x + r1->w, r1->y + r1->h, r2->x, r2-y, r2->x + r2->w, r2->y + r2->h);
+}
+
+bool rectangle_contains_point(float l, float t, float r, float b, float x, float y)
+{
+    return !(x < l || x > r || y < t || y > b);
+}
+
+bool rectangle_contains_point_ex(Rectangle r, Point p)
+{
+    return rectangle_contains_point(r->x, r-y, r->x + r->w, r->y + r->h, p->x, p->y);
+}
+
+bool circles_intersect(float x1, float y1, float r1, float x2, float y2, float r2)
+{
+    float radii = r1 + r2;
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    return (radii * radii) > (dx * dx + dy * dy);
+}
+
+bool circles_intersect_ex(Circle c1, Circle c2)
+{
+    return circles_intersect(c1->x, c1->y, c1->r, c2->x, c2->y, c2->r);
+}
+
+bool circle_contains_point(float x1, float y1, float r, float x2, float y2)
+{
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    return (dx * dx + dy * dy) < (r * r);
+}
+
+bool circle_contains_point_ex(Circle c, Point p)
+{
+    return circle_contains_point(c->x, c->y, c->r, p->x, p->y);
 }

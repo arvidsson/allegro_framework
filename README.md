@@ -59,13 +59,8 @@ example
 // example: a bouncing rectangle
 #include "allegro_framework.h"
 
-typedef struct {
-    float x, y;
-    float w, h;
-    float dx, dy;
-} Rectangle;
-
-Rectangle r = { 50, 50, 50, 50, 3, 3 };
+Rectangle r = { 50, 50, 50, 50 };
+Velocity v = { 3, 3 };
 
 void update()
 {
@@ -73,15 +68,15 @@ void update()
         quit();
     }
 
-    r.x += r.dx;
-    r.y += r.dy;
+    r.x += v.dx;
+    r.y += v.dy;
 
     if (r.x < 0 || r.x + r.w > get_window_width()) {
-        r.dx = -r.dx;
+        v.dx = -v.dx;
     }
 
     if (r.y < 0 || r.y + r.h > get_window_height()) {
-        r.dy = -r.dy;
+        v.dy = -v.dy;
     }
 }
 
