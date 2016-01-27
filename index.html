@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>allegro_framework by arvidsson</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">allegro_framework</h1>
+      <h2 class="project-tagline">Small framework written in C using Allegro 5.</h2>
+      <a href="https://github.com/arvidsson/allegro_framework" class="btn">View on GitHub</a>
+      <a href="https://github.com/arvidsson/allegro_framework/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/arvidsson/allegro_framework/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="allegro_framework" class="anchor" href="#allegro_framework" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>allegro_framework</h1>
+
+<p>A small framework written in C for use with the Allegro 5 library. The main
+purpose of the framework is to make it easy to quickly get going with a project</p>
+
+<ul>
+<li>thus it could be beneficial for prototyping new ideas (for example in gamejams<br>
+such as ludum dare) as well as for newbies who just want to try out allegro without
+having to bother with all the required setup (e.g. event queues, addons, etc).</li>
+</ul>
+
+<p>See <code>allegro_framework.h</code> for more detailed documentation of the framework,
+and the example below for a quick intro on how to use it.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
+
+<h3>
+<a id="initializes-allegro" class="anchor" href="#initializes-allegro" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Initializes Allegro</h3>
+
+<p><code>init_framework()</code> will setup allegro, useful addons, and create the basic things we need, such as an event queue
+and a display.</p>
+
+<h3>
+<a id="game-loop" class="anchor" href="#game-loop" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Game loop</h3>
+
+<p><code>run_game_loop()</code> starts the game loop. This function will call the two callbacks that you provide to the function until you
+ask the game to quit.</p>
+
+<h3>
+<a id="simplified-input" class="anchor" href="#simplified-input" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Simplified input</h3>
+
+<p>The input from keyboard and mouse is polled each frame. Functions, such as <code>is_key_down()</code>, should be used in the update method defined
+by the user in order to check for the input.</p>
+
+<h3>
+<a id="error-handling" class="anchor" href="#error-handling" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Error handling</h3>
+
+<p>Use <code>log_error()</code> to log an error message which will forcefully quit the program. <code>destroy_framework()</code> is
+called automatically and will clean up everything that the framework has put in place. Use <code>atexit()</code> if you want to
+automatically clean up your own stuff when errors happen.</p>
+
+<h3>
+<a id="logging" class="anchor" href="#logging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logging</h3>
+
+<p>Simple logfile functionality exists. It was mostly implemented because the framework somehow needs to be able to
+report when errors happen. Use <code>log_message()</code> for simple debug messages, otherwise <code>log_warning()</code> for non-fatal errors and <code>log_error()</code>
+for fatal errors.</p>
+
+<h3>
+<a id="random-number-generation" class="anchor" href="#random-number-generation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Random number generation</h3>
+
+<ul>
+<li>Uses <code>rand()</code>, and <code>srand()</code> is called in <code>init_framework()</code>.</li>
+<li>Random number generation between a range (e.g. <code>get_random_int()</code>).</li>
+<li>
+<code>one_in()</code> and <code>roll_dice()</code>
+</li>
+</ul>
+
+<h3>
+<a id="misc" class="anchor" href="#misc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Misc</h3>
+
+<ul>
+<li>Waiting for keypress function.</li>
+<li>Alt-tab behavior (whether the game should pause when it's not in focus).</li>
+<li>Alt-enter toggles fullscreen mode.</li>
+</ul>
+
+<h3>
+<a id="math--collision-detection" class="anchor" href="#math--collision-detection" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Math &amp; Collision detection</h3>
+
+<ul>
+<li>Useful constants, structs and functions for detecting collisions.</li>
+</ul>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>example</h2>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-c">// example: a bouncing rectangle</span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>allegro_framework.h<span class="pl-pds">"</span></span>
+
+Rectangle r = { <span class="pl-c1">50</span>, <span class="pl-c1">50</span>, <span class="pl-c1">50</span>, <span class="pl-c1">50</span> };
+Velocity v = { <span class="pl-c1">3</span>, <span class="pl-c1">3</span> };
+
+<span class="pl-k">void</span> <span class="pl-en">update</span>()
+{
+    <span class="pl-k">if</span> (<span class="pl-c1">is_key_down</span>(ALLEGRO_KEY_ESCAPE)) {
+        <span class="pl-c1">quit</span>();
+    }
+
+    r.<span class="pl-smi">x</span> += v.<span class="pl-smi">dx</span>;
+    r.<span class="pl-smi">y</span> += v.<span class="pl-smi">dy</span>;
+
+    <span class="pl-k">if</span> (r.<span class="pl-smi">x</span> &lt; <span class="pl-c1">0</span> || r.<span class="pl-smi">x</span> + r.<span class="pl-smi">w</span> &gt; <span class="pl-c1">get_window_width</span>()) {
+        v.<span class="pl-smi">dx</span> = -v.<span class="pl-smi">dx</span>;
+    }
+
+    <span class="pl-k">if</span> (r.<span class="pl-smi">y</span> &lt; <span class="pl-c1">0</span> || r.<span class="pl-smi">y</span> + r.<span class="pl-smi">h</span> &gt; <span class="pl-c1">get_window_height</span>()) {
+        v.<span class="pl-smi">dy</span> = -v.<span class="pl-smi">dy</span>;
+    }
+}
+
+<span class="pl-k">void</span> <span class="pl-en">render</span>()
+{
+    <span class="pl-c1">al_draw_filled_rectangle</span>(r.<span class="pl-smi">x</span>, r.<span class="pl-smi">y</span>, r.<span class="pl-smi">x</span> + r.<span class="pl-smi">w</span>, r.<span class="pl-smi">y</span> + r.<span class="pl-smi">h</span>, red_color);
+}
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>(<span class="pl-k">int</span> argc, <span class="pl-k">char</span> *argv[])
+{
+    <span class="pl-c">// must be called first!</span>
+    <span class="pl-c1">init_framework</span>(<span class="pl-s"><span class="pl-pds">"</span>example<span class="pl-pds">"</span></span>, <span class="pl-c1">640</span>, <span class="pl-c1">480</span>, <span class="pl-c1">false</span>);
+
+    <span class="pl-c">// the game loop runs until we call quit()</span>
+    <span class="pl-c1">run_game_loop</span>(update, render);
+
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/arvidsson/allegro_framework">allegro_framework</a> is maintained by <a href="https://github.com/arvidsson">arvidsson</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
