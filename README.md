@@ -1,66 +1,29 @@
 allegro_framework
-=================
+===========
 
-A small framework written in C for use with the Allegro 5 library. The main
-purpose of the framework is to make it easy to quickly get going with a project
-- thus it could be beneficial for prototyping new ideas (for example in gamejams  
-such as ludum dare) as well as for newbies who just want to try out allegro without
-having to bother with all the required setup (e.g. event queues, addons, etc).
+Tiny Allegro 5 C framework.
 
-See `allegro_framework.h` for more detailed documentation of the framework,
-and the example below for a quick intro on how to use it.
+> Quickly prototype ideas or get acquainted with Allegro 5 without having to reinvent the game loop!
 
 Features
 --------
 
-### Initializes Allegro ###
+* easy setup of allegro and addons
+* game loop
+* simplified input
+* error handling and logging
+* random number generation
+* basic collision detection
 
-`init_framework()` will setup allegro, useful addons, and create the basic things we need, such as an event queue
-and a display.
+Install
+------------
 
-### Game loop ###
+Include ```allegro_framework.c``` and ```allegro_framework.h``` in your project.
 
-`run_game_loop()` starts the game loop. This function will call the two callbacks that you provide to the function until you
-ask the game to quit.
-
-### Simplified input ###
-
-The input from keyboard and mouse is polled each frame. Functions, such as `is_key_down()`, should be used in the update method defined
-by the user in order to check for the input.
-
-### Error handling ###
-
-Use `log_error()` to log an error message which will forcefully quit the program. `destroy_framework()` is
-called automatically and will clean up everything that the framework has put in place. Use `atexit()` if you want to
-automatically clean up your own stuff when errors happen.
-
-### Logging ###
-
-Simple logfile functionality exists. It was mostly implemented because the framework somehow needs to be able to
-report when errors happen. Use `log_message()` for simple debug messages, otherwise `log_warning()` for non-fatal errors and `log_error()`
-for fatal errors.
-
-### Random number generation ###
-
-* Uses `rand()`, and `srand()` is called in `init_framework()`.
-* Random number generation between a range (e.g. `get_random_int()`).
-* `one_in()` and `roll_dice()`
-
-### Misc ###
-
-* Waiting for keypress function.
-* Alt-tab behavior (whether the game should pause when it's not in focus).
-* Alt-enter toggles fullscreen mode.
-
-### Math & Collision detection ###
-
-* Useful constants, structs and functions for detecting collisions.
-
-example
+Example
 -------
 
-```c++
-// example: a bouncing rectangle
+```c
 #include "allegro_framework.h"
 
 Rectangle r = { 50, 50, 50, 50 };
@@ -100,3 +63,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
+License
+-------
+MIT (c) arvidsson
