@@ -170,13 +170,22 @@ int wait_for_keypress();
 //==============================================================================
 
 // Math Constants.
+#define ALMOST_ZERO (0.001)
 #define PI (3.14159265358979323846)
 #define TWO_PI (PI * 2)
 #define HALF_PI (PI / 2)
+#define QUARTER_PI (PI / 4)
+#define EULER_NUMBER (2.718281828459045)
 
 // Convert to and from degrees and radians.
 #define DEG2RAD(DEG) ((DEG)*((PI)/(180.0)))
 #define RAD2DEG(RAD) ((RAD)*((180.0)/(PI)))
+
+bool is_float_equal(float a, float b);
+bool is_double_equal(double a, double b);
+int lerpi(int a, int b, int alpha);
+float lerpf(float a, float b, float alpha);
+double lerpd(double a, double b, double alpha);
 
 //==============================================================================
 // RANDOM
