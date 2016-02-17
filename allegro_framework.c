@@ -364,6 +364,31 @@ int wait_for_keypress()
     return event.keyboard.keycode;
 }
 
+bool is_float_equal(float a, float b)
+{
+	return fabs(a - b) < ALMOST_ZERO;
+}
+
+bool is_double_equal(double a, double b)
+{
+	return fabs(a - b) < ALMOST_ZERO;
+}
+
+int lerpi(int a, int b, int alpha)
+{
+	return a + alpha * (b - a);
+}
+
+float lerpf(float a, float b, float alpha)
+{
+	return a + alpha * (b - a);
+}
+
+double lerpd(double a, double b, double alpha)
+{
+	return a + alpha * (b - a);
+}
+
 int get_random_int(int min, int max)
 {
     return min + (rand() % (int)(max - min + 1));
